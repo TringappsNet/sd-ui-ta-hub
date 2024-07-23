@@ -1,6 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {backend_url} from "../../constants/app_constants";
+import { Client } from '../../constants/types';
 
-const initialState = {
+interface clientState{
+  clients:Client[],
+}
+const initialState:clientState = {
   clients: [],
 };
 
@@ -32,7 +37,7 @@ export const { setClients, addNewClient, updateClient, deleteClient } = clientsS
 // Function to delete client on the server
 export const deleteClientOnServer = (clientId) => async () => {
   try {
-    const response = await fetch(`http://localhost:8080/api/clients/client/${clientId}`, {
+    const response = await fetch(`${backend_url}/api/clients/client/${clientId}`, {
       method: 'DELETE',
     });
 
@@ -52,7 +57,7 @@ export const deleteClientOnServer = (clientId) => async () => {
 export const updateClientOnServer = (userData) => async () => {
   try {
     const {clientId}=userData;
-    const response = await fetch(`http://localhost:8080/api/clients/client/${clientId}`, {
+    const response = await fetch(`${backend_url}/api/clients/client/${clientId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -75,7 +80,7 @@ export const updateClientOnServer = (userData) => async () => {
 
 export const handleClientAdd = async (newEmptyRow) => {
   try {
-    const response = await fetch('http://localhost:8080/api/clients/client', {
+    const response = await fetch(`${backend_url}/api/clients/client`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

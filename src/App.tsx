@@ -10,6 +10,7 @@ import Board from "./components/Dnd";
 // import Dashboard from "./components/Dashboard";
 import Sidebar from "./components/Sidebar";
 import ApprovalRequest from "./components/ApprovalRequest";
+import React from "react";
 
 const App = () => {
   return (
@@ -21,10 +22,8 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/navbar" element={<Navbar />} />
+            <Route path="/board" element={<Navbar />} />
             <Route path="/reset-new" element={<ResetNew/>} />
-            <Route path="/side-bar" element={<Sidebar/>} />
-            <Route path="/side-bar" element={<Sidebar/>} />
             <Route path="/approval-req" element={<ApprovalRequest/>} /> 
             {/* <Route path="/board" element={<Board/>} /> */}
             

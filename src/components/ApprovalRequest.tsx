@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Container, Box } from '@mui/material';
 import { CheckCircleOutline, ErrorOutline } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { backend_url } from '../constants/app_constants';
 
 export default function ApprovalRequest() {
   const [message, setMessage] = useState('');
@@ -27,7 +28,7 @@ export default function ApprovalRequest() {
 
   const approveRequirement = async (token: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/approve-requirement?token=${token}`, {
+      const response = await fetch(`${backend_url}/api/approve-requirement?token=${token}`, {
         method: 'POST',
       });
 
@@ -53,7 +54,7 @@ export default function ApprovalRequest() {
   useEffect(() => {
     if (status) {
       const timer = setTimeout(() => {
-        navigate('/navbar');
+        navigate('/board');
       }, 5000);
 
       return () => clearTimeout(timer);

@@ -5,6 +5,7 @@ import '../styles/register.css';
 import CustomSnackbar from "./CustomSnackbar";
 import { useLocation } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
+import {backend_url} from '../constants/app_constants';
 
 function Register() {
     const [formData, setFormData] = useState({
@@ -66,7 +67,7 @@ function Register() {
               // email: formData.email,
               // confirmPassword: formData.confirmPassword
 
-            const response = await fetch(`http://localhost:8080/api/auth/register?inviteToken=${inviteToken }`, {
+            const response = await fetch(`${backend_url}/api/auth/register?inviteToken=${inviteToken }`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
