@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import '../styles/resetPassword.css';
 import CustomSnackbar from "./CustomSnackbar";
+import { backend_url } from "../constants/app_constants";
 
 function ResetNew() {
     const [newPassword, setNewPassword] = useState("");
@@ -36,7 +37,7 @@ function ResetNew() {
                 newPassword: newPassword
             });
 
-            const response = await fetch("http://localhost:8080/api/auth/reset-password", {
+            const response = await fetch(`${backend_url}/api/auth/reset-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"

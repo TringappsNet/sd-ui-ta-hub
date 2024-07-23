@@ -2,7 +2,8 @@ import {  GridToolbarContainer } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import { randomId } from '@mui/x-data-grid-generator';
-
+import {backend_url} from '../constants/app_constants'
+import React from 'react';
 
 export default 
 function EditToolbar(props) {
@@ -16,7 +17,7 @@ function EditToolbar(props) {
 
 
         try {
-            const response = await fetch('http://localhost:8080/api/users/user', {
+            const response = await fetch(`${backend_url}/api/users/user`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -4,8 +4,9 @@ import { createRoot } from 'react-dom/client'; // Import createRoot from react-d
 import App from './App.jsx';
 import { Provider } from 'react-redux';
 import { store } from "../src/GlobalRedux/store";
+import { Container } from 'react-dom';
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <Provider store={store}>
       <App />

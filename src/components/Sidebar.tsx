@@ -72,10 +72,10 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveComponent }) => {
         <FaTh />
         <MenuText className="board plan ">Board</MenuText>
       </MenuItem>
-      <MenuItem active={activeComponent === 'timeline'} onClick={() => handleMenuItemClick('timeline')}>
+      {/* <MenuItem active={activeComponent === 'timeline'} onClick={() => handleMenuItemClick('timeline')}>
         <FaList />
         <MenuText className="board plan">Timeline</MenuText>
-      </MenuItem>
+      </MenuItem> */}
       <MenuItem active={activeComponent === 'list'} onClick={() => handleMenuItemClick('list')}>
         <FaList />
         <MenuText className="board plan">List</MenuText>

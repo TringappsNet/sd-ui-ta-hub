@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import '../styles/login.css';
 import CustomSnackbar from "./CustomSnackbar";
+import { backend_url } from "../constants/app_constants";
 // import Loader from "./Loader"; 
 
 function Login() {
@@ -44,7 +45,7 @@ function Login() {
 
         try {
             setLoading(true);  // Start loader
-            const response = await fetch("http://localhost:8080/api/auth/login", {
+            const response = await fetch(`${backend_url}/api/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -65,7 +66,7 @@ function Login() {
             setSnackbarVariant("success");
             setTimeout(() => {
                 setLoading(false);  // Stop loader before navigation
-                navigate('/navbar'); 
+                navigate('/board'); 
             }, 2000);
 
         } catch (error) {
@@ -83,7 +84,7 @@ function Login() {
 
     const handleGoogleSignIn = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/google-sign-in", {
+            const response = await fetch(`${backend_url}/api/google-sign-in`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json"

@@ -1,6 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-
-const initialState = {
+import {backend_url} from "../../constants/app_constants"
+import { Candidate } from '../../constants/types';
+interface candidateState{
+  candidates: Candidate[],
+}
+const initialState:candidateState = {
   candidates: [],
   
 };
@@ -33,7 +37,7 @@ export const { setCandidates, addNewCandidate, updateCandidate, deleteCandidate 
 // Function to delete candidate on the server
 export const deleteCandidateOnServer = (candidateId) => async () => {
   try {
-    const response = await fetch(`http://localhost:8080/api/candidates/candidate/${candidateId}`, {
+    const response = await fetch(`${backend_url}/api/candidates/candidate/${candidateId}`, {
       method: 'DELETE',
     });
 
@@ -55,7 +59,7 @@ export const updateCandidateOnServer = (userData) => async () => {
     // Destructure userData and exclude clientName and taskCandidateStatus
     
     // const { clientName, taskCandidateStatus, ...payload } = userData;
-    const response = await fetch(`http://localhost:8080/api/candidates/candidate/${userData.candidateId}`, {
+    const response = await fetch(`${backend_url}/api/candidates/candidate/${userData.candidateId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -78,7 +82,7 @@ export const updateCandidateOnServer = (userData) => async () => {
 
 export const handleCandidateAdd = async (newEmptyRow) => {
   try {
-    const response = await fetch('http://localhost:8080/api/candidates/candidate', {
+    const response = await fetch(`${backend_url}/api/candidates/candidate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

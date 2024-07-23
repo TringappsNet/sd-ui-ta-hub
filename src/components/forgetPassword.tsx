@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 // import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import '../styles/forgetPassowrd.css';
 import CustomSnackbar from "./CustomSnackbar";
+import { backend_url } from "../constants/app_constants";
 
 
 function ForgetPassword() {
@@ -19,7 +20,7 @@ function ForgetPassword() {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:8080/api/auth/forgot-password", {
+            const response = await fetch(`${backend_url}/api/auth/forgot-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -1,16 +1,21 @@
-  import { useState, useEffect } from 'react';
-  import 'bootstrap/dist/css/bootstrap.css';
-  import "../styles/Dnd.css";
-  import { Card, CardContent, TextField, Button } from '@mui/material';
-  import ConfirmDialog from "../Grid/ConfirmationDialog";
-  import 'bootstrap-icons/font/bootstrap-icons.css';
-  import AddBoxIcon from '@mui/icons-material/AddBox';
-  import FullScreenPopup from './FullScreenPopup';
-  import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useState, useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.css';
+import "../styles/Dnd.css";
+import { Card, CardContent, TextField, Button } from '@mui/material';
+import ConfirmDialog from "../Grid/ConfirmationDialog";
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import FullScreenPopup from './FullScreenPopup';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { backend_url } from '../constants/app_constants';
+import { columnProps, Task } from '../constants/types';
+import React from 'react';
+
+
 
   const Board = () => {
-    const [tasks, setTasks] = useState([]);
-    const [columns, setColumns] = useState([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [columns, setColumns] = useState<columnProps[]>([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [newTaskStatus, setNewTaskStatus] = useState("");
     const [deleteConfirmation, setDeleteConfirmation] = useState(false);
@@ -21,7 +26,7 @@
     const [showFullScreenPopup, setShowFullScreenPopup] = useState(false);
     const [checkedTasks, setCheckedTasks] = useState({});
     const [searchQuery, setSearchQuery] = useState("");
-    const [filteredTasks, setFilteredTasks] = useState([]);
+    const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
 
    
   const handleCheckboxClick = (taskId, event) => {
@@ -36,7 +41,7 @@
     useEffect(() => {
       const fetchColumns = async () => {
         try {
-          const response = await fetch('http://localhost:8080/api/board/columns');
+          const response = await fetch(`${backend_url}/api/board/columns`);
           if (response.ok) {
             const data = await response.json();
             const initialColumns = data.map(column => ({
@@ -60,9 +65,10 @@
     useEffect(() => {
       const fetchTasks = async () => {
         try {
-          const response = await fetch('http://localhost:8080/api/tasks/task/view');
+          const response = await fetch(`${backend_url}/api/tasks/task/view`);
           if (response.ok) {
             const data = await response.json();
+
             const updatedTasks = data.map(task => {
               if (!task.taskStatus) {
                 return { ...task, taskStatus: "todo" };
@@ -84,7 +90,9 @@
 
 
     useEffect(() => {
-      const columnCounts = columns.map(column => ({
+      console.log("columns", columns);
+      console.log("tasks", tasks);
+      const columnCounts = columns.map((column) => ({
         ...column,
         count: tasks.filter(task => task.taskStatus === column.column).length
       }));
@@ -97,7 +105,7 @@
 
 
     useEffect(() => {
-      const filtered = tasks.filter(task =>
+      const filtered:Task[] = tasks.filter(task =>
         task.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.roleType.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.workLocation.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -128,7 +136,7 @@
       event.dataTransfer.clearData();
 
       try {
-        await fetch(`http://localhost:8080/api/tasks/task/${droppedTask.taskId}`, {
+        await fetch(`${backend_url}/api/tasks/task/${droppedTask.taskId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -154,7 +162,7 @@
       setShowAddForm(false);
       setNewTaskStatus("");
       try {
-        const response = await fetch('http://localhost:8080/api/board/column', {
+        const response = await fetch(`${backend_url}/api/board/column`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -198,7 +206,7 @@
     const handleConfirmDelete = async () => {
       if (deleteItemType === "column") {
         try {
-          const response = await fetch(`http://localhost:8080/api/board/column/${deleteItemId}`, {
+          const response = await fetch(`${backend_url}/api/board/column/${deleteItemId}`, {
             method: 'DELETE',
           });
           if (response.ok) {
@@ -213,12 +221,12 @@
         }
       } else if (deleteItemType === "task") {
         try {
-          const response = await fetch(`http://localhost:8080/api/tasks/task/${deleteItemId}`, {
+          const response = await fetch(`${backend_url}/api/tasks/task/${deleteItemId}`, {
             method: 'DELETE',
           });
           if (response.ok) {
             console.log('Task deleted successfully.');
-            const updatedTasks = tasks.filter(task => task.taskId !== deleteItemId);
+            const updatedTasks:Task[] = tasks.filter(task => task.taskId !== deleteItemId);
             setTasks(updatedTasks);
           } else {
             console.error('Failed to delete task:', response.statusText);
@@ -279,7 +287,7 @@
         {column.title} {column.count} 
    
       </h6>
-      {!column.count > 0 && (
+      {!(column.count > 0) && (
         <div className="delete-button" onClick={() => handleDeleteColumn(column.id)}>
           <span className="bi bi-trash"></span>
         </div>
@@ -300,12 +308,12 @@
       </div>
     </div>
     <p className='task-detail'>
-      <h7 className="getstat clientName">{task.clientName}</h7>
+      <h6 className="getstat clientName">{task.clientName}</h6>
     </p>
     <div className='d-flex justify-content-between'>
-      <h7 className="getstat">{task.roleType}</h7>
-      <h7 className="getstat">{task.workLocation}</h7>
-      <h7 className="getstat">{task.modeOfWork}</h7>
+      <h6 className="getstat">{task.roleType}</h6>
+      <h6 className="getstat">{task.workLocation}</h6>
+      <h6 className="getstat">{task.modeOfWork}</h6>
     </div>
     <div className='d-flex justify-content-between align-items-center mt-2'>
       <div className='d-flex align-items-center checkbox1'>
@@ -314,7 +322,7 @@
               className="task-checkbox" 
                                 checked={checkedTasks[task.taskId] || false}
                                 onClick={(event) => handleCheckboxClick(task.taskId, event)}
-            />        <h7 className="kanid ms-2">KAN-{task.taskId}</h7>
+            />        <h6 className="kanid ms-2">KAN-{task.taskId}</h6>
       </div>
     </div>
   </CardContent>

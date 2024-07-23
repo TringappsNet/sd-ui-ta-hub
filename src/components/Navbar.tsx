@@ -14,6 +14,7 @@ import Board from './Dnd';
 import Timeline from './Timeline';
 import List from './List';
 import Loader from  "../components/Loader";
+import { backend_url } from '../constants/app_constants';
 
 const Navbar = () => {
   const [showGrid, setShowGrid] = useState(false);
@@ -56,10 +57,10 @@ const Navbar = () => {
     }, 1000);
   };
 
-  const handleLoadCandidatesClick = () => handleLoadData('candidates', 'http://localhost:8080/api/candidates/status');
-  const handleLoadClientsClick = () => handleLoadData('clients', 'http://localhost:8080/api/clients/clientPositions');
-  const handleLoadUsersClick = () => handleLoadData('users', 'http://localhost:8080/api/users/');
-  const handleloadlistClients = () => handleLoadData('loadclients', 'http://localhost:8080/api/clients/');
+  const handleLoadCandidatesClick = () => handleLoadData('candidates', `${backend_url}/api/candidates/status`);
+  const handleLoadClientsClick = () => handleLoadData('clients', `${backend_url}/api/clients/clientPositions`);
+  const handleLoadUsersClick = () => handleLoadData('users', `${backend_url}/api/users/`);
+  const handleloadlistClients = () => handleLoadData('loadclients', `${backend_url}/api/clients/`);
 
   const GridContainer = styled.div`
     display: ${showGrid ? 'block' : 'none'};
@@ -72,7 +73,7 @@ const Navbar = () => {
     <div>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid ">
-          <a className="navbar-brand" href="/navbar">tringapps</a>
+          <a className="navbar-brand" href="/board">tringapps</a>
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav">
               <li className="nav-item">

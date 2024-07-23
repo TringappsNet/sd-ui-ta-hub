@@ -1,6 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {backend_url} from '../../constants/app_constants';
+import { User } from "../../constants/types";
 
-const initialState = {
+interface userState {
+  users: User[];
+}
+const initialState: userState = {
   users: [],
 };
 
@@ -32,7 +37,7 @@ export const { setUsers, updateUser, deleteUser, addNewUser } = usersSlice.actio
 
 export const deleteUserOnServer = (userId) => async (dispatch) => {
   try {
-    const response = await fetch(`http://localhost:8080/api/users/user/${userId}`, {
+    const response = await fetch(`${backend_url}/api/users/user/${userId}`, {
       method: 'DELETE',
     });
 
@@ -49,7 +54,7 @@ export const deleteUserOnServer = (userId) => async (dispatch) => {
 export const updateUserOnServer = async (userData) => {
   try {
      
-      const response = await fetch(`http://localhost:8080/api/users/user/${userData.userId}`, {
+      const response = await fetch(`${backend_url}/api/users/user/${userData.userId}`, {
           method: 'PUT',
           headers: {
               'Content-Type': 'application/json',
@@ -74,7 +79,7 @@ export const updateUserOnServer = async (userData) => {
 	
 export const handleUserAdd = async (newEmptyRow) => {
   try {
-    const response = await fetch('http://localhost:8080/api/users/user', {
+    const response = await fetch(`${backend_url}/api/users/user`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
