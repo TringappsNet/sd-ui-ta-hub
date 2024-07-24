@@ -256,8 +256,7 @@ import React from 'react';
       <div className="board-container">
         <div className="header1">
           <div className='d-flex'>
-          <h6>Projects / TA Board</h6>
-          <h6>KAN Board</h6>
+          <h6>My TA Board</h6>
           </div>
           <div className="search-container">
           <TextField
