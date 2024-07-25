@@ -18,7 +18,7 @@ interface Position {
   jobTitle: string;
   noOfOpenings: string;
   roleType: string;
-  modeOfWork: string;
+  modeOfWork: string; 
   workLocation: string;
   yearsOfExperienceRequired: string;
   primarySkillSet: string;
@@ -266,14 +266,22 @@ const handleAddPosition = () => {
   };
   const processRowUpdate = (newRow: GridRowModel, oldRow: GridRowModel) => {
     
-    const isEmptyField = Object.values(newRow).some(value => value === '');
-
-    if (isEmptyField) {
-        setSnackbarOpen(true);
-        setSnackbarMessage("Please fill all fields before saving.");
-        setSnackbarVariant("error");
-        return oldRow; 
+    const isEmptyField = Object.keys(newRow).some(key => {
+      if (key === 'secondarySkillSet') {
+        return false;
     }
+
+    if (newRow[key] === '') {
+
+      setSnackbarOpen(true);
+      setSnackbarMessage(`Please fill ${key} before saving.`);
+      setSnackbarVariant("error");
+      return true; 
+  }
+
+  return false;
+
+});
 
     const updatedPositions = positions.map((position) => {
         if (position.id === newRow.id) {
@@ -289,7 +297,7 @@ const handleAddPosition = () => {
 };
   const columns: GridColDef[] = [
     { field: 'jobTitle', headerName: 'Job Title', width: 150, editable: true },
-    { field: 'noOfOpenings', headerName: 'No of Openings', width: 150, editable: true },
+    { field: 'noOfOpenings', headerName: 'No. of Openings', width: 150, editable: true, valueParser: (value) => (isNaN(value) || !Number.isInteger(Number(value)) ? null : Number(value)) },
     {
       field: 'roleType',
       headerName: 'Role Type',
@@ -305,7 +313,7 @@ const handleAddPosition = () => {
       renderEditCell: (params) => <DropdownEditCell {...params} />,
     },
     { field: 'workLocation', headerName: 'Work Location', width: 150, editable: true },
-    { field: 'yearsOfExperienceRequired', headerName: 'Years of Experience', width: 150, editable: true },
+    { field: 'yearsOfExperienceRequired', headerName: 'Years of Experience', width: 150, editable: true, valueParser: (value) => (isNaN(value) || !Number.isInteger(Number(value)) ? null : Number(value)) },
     { field: 'primarySkillSet', headerName: 'Primary Skill set', width: 150, editable: true },
     { field: 'secondarySkillSet', headerName: 'Secondary Skill set', width: 150, editable: true },
     {
@@ -527,7 +535,7 @@ const handleAddPosition = () => {
                                         type="number" 
                                         id='proj-duration'
                                         className="input-box-duration" 
-                                        placeholder='Enter the month'
+                                        placeholder='Enter month'
                                         style={{ borderColor: (formSubmitted && projectStartDate.trim() === '') ? 'red' : '' }}
                                         name="contact" 
                                         value={projectStartDate} 
