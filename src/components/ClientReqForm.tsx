@@ -2,27 +2,23 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.css';
-import '../styles/Form.css';
+import '../styles/ClientReqForm.css';
 import { FaTimes } from 'react-icons/fa'; 
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { submitForm } from '../GlobalRedux/Features/formSlice';
 import SimplePopup from './popUp';
 import { Select, MenuItem, Button, IconButton } from '@mui/material';
 import { DataGrid, GridColDef, GridRowId, GridRowModel, GridRowEditStopReasons, GridRowModesModel, GridRowModes } from '@mui/x-data-grid';
-import CustomSnackbar from "../components/CustomSnackbar";
+import CustomSnackbar from "./CustomSnackbar";
 import { Tooltip } from '@mui/material';
-import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon } from '@mui/icons-material';
-
-
-
+import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Close as CloseIcon } from '@mui/icons-material';
 
 interface Position {
   id: number;
   jobTitle: string;
   noOfOpenings: string;
   roleType: string;
-  modeOfWork: string;
+  modeOfWork: string; 
   workLocation: string;
   yearsOfExperienceRequired: string;
   primarySkillSet: string;
@@ -73,29 +69,27 @@ function Form() {
         setNoOfOpenings(totalOpenings);
       }, [positions]);
       
-
       const submitFormHandler = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setFormSubmitted(true); 
-     if (
-        !clientName ||
-        !clientSpocName ||
-        !reqStartDate ||
-        !clientSpocContact ||
-        !accountManager ||
-        !accountManagerEmail ||
-        !salaryBudget ||
-        !modeOfInterviews ||
-        !projectStartDate ||
-        !approvedBy ||
-        !noOfOpenings
-    ) {
-        setSnackbarOpen(true);
-        setSnackbarMessage("Please fill all fields!");
-        setSnackbarVariant("error");
-        return;
-    }
-    
+        if (
+          clientName.trim() === '' ||
+          clientSpocName.trim() === '' ||
+          !startDate || 
+          clientSpocContact.trim() === '' ||
+          accountManager.trim() === '' ||
+          accountManagerEmail.trim() === '' ||
+          salaryBudget.trim() === '' ||
+          modeOfInterviews === '' ||
+          projectStartDate.trim() === '' ||
+          approvedBy.trim() === '' ||
+          positions.length === 0 
+        ) {
+          setSnackbarOpen(true);
+          setSnackbarMessage("Please fill all fields!");
+          setSnackbarVariant("error");
+          return;
+        }  
         const formData = [{
             requirementStartDate: reqStartDate?.toISOString(),
             clientName,
@@ -189,7 +183,6 @@ function Form() {
             console.error('An error occurred while submitting form data:', error);
         }
     };
-    
 
   const handleAddField = () => {
     setShowPopup(true);
@@ -220,7 +213,6 @@ const handleAddPosition = () => {
       [newPosition.id]: { mode: GridRowModes.Edit, fieldToFocus: 'jobTitle' },
   }));
 };
-
 
   const handleSavePosition = (id: GridRowId) => () => {
     setRowModesModel((prevModel) => ({
@@ -273,20 +265,26 @@ const handleAddPosition = () => {
     );
   };
   const processRowUpdate = (newRow: GridRowModel, oldRow: GridRowModel) => {
-    // Check if any field in the new row is empty
-    const isEmptyField = Object.values(newRow).some(value => value === '');
-
-    if (isEmptyField) {
-        setSnackbarOpen(true);
-        setSnackbarMessage("Please fill all fields before saving.");
-        setSnackbarVariant("error");
-        return oldRow; // Return the old row to prevent updating
+    
+    const isEmptyField = Object.keys(newRow).some(key => {
+      if (key === 'secondarySkillSet') {
+        return false;
     }
 
-    // Update the row in the positions state
+    if (newRow[key] === '') {
+
+      setSnackbarOpen(true);
+      setSnackbarMessage(`Please fill ${key} before saving.`);
+      setSnackbarVariant("error");
+      return true; 
+  }
+
+  return false;
+
+});
+
     const updatedPositions = positions.map((position) => {
         if (position.id === newRow.id) {
-            // Update only the fields that are not empty in the new row
             const updatedPosition = { ...position, ...newRow };
             return updatedPosition;
         } else {
@@ -297,12 +295,9 @@ const handleAddPosition = () => {
     setPositions(updatedPositions);
     return newRow;
 };
-
-
-
   const columns: GridColDef[] = [
     { field: 'jobTitle', headerName: 'Job Title', width: 150, editable: true },
-    { field: 'noOfOpenings', headerName: 'No. of Openings', width: 150, editable: true },
+    { field: 'noOfOpenings', headerName: 'No. of Openings', width: 150, editable: true, valueParser: (value) => (isNaN(value) || !Number.isInteger(Number(value)) ? null : Number(value)) },
     {
       field: 'roleType',
       headerName: 'Role Type',
@@ -318,7 +313,7 @@ const handleAddPosition = () => {
       renderEditCell: (params) => <DropdownEditCell {...params} />,
     },
     { field: 'workLocation', headerName: 'Work Location', width: 150, editable: true },
-    { field: 'yearsOfExperienceRequired', headerName: 'Years of Experience', width: 150, editable: true },
+    { field: 'yearsOfExperienceRequired', headerName: 'Years of Experience', width: 150, editable: true, valueParser: (value) => (isNaN(value) || !Number.isInteger(Number(value)) ? null : Number(value)) },
     { field: 'primarySkillSet', headerName: 'Primary Skill set', width: 150, editable: true },
     { field: 'secondarySkillSet', headerName: 'Secondary Skill set', width: 150, editable: true },
     {
@@ -372,10 +367,11 @@ const handleAddPosition = () => {
                         </div>
                         <div className="scrollable-area">
                             <div className='fields'>
-                                <div className="form-group p-2">
-                                    <label htmlFor="cname" className="form-label">Client Name</label>
+                                <div className="form-group pt-1 px-2">
+                                    <label htmlFor="cname" className="form-label ">Client Name</label>
                                     <input 
                                         type="text" 
+                                        placeholder='Enter company Name'
                                         style={{ borderColor: (formSubmitted && clientName.trim() === '') ? 'red' : '' }} 
                                         className="input-box" 
                                         name="cname"  
@@ -383,66 +379,73 @@ const handleAddPosition = () => {
                                         onChange={(e) => setClientName(e.target.value)}  
                                     />
                                 </div>
-                                <div className="form-group p-2">
+                                <div className="form-group pt-1 px-2">
                                     <label htmlFor="spocname" className="form-label">Client SPOC Name</label>
                                     <input 
                                         type="text" 
                                         className="input-box" 
+                                        placeholder='Enter SPOC Name'
+                                        style={{ borderColor: (formSubmitted && clientSpocName.trim() === '') ? 'red' : '' }} 
                                         name="spocname" 
                                         value={clientSpocName} 
                                         onChange={(e) => setClientSpocName(e.target.value)} 
                                     />
                                 </div>
-                                <div className="form-group pt-3 p-2">
-                                    <label htmlFor="date" className="form-label">Requirement Start Date</label>
-                                    <div className="date-picker-container">
-                                        <DatePicker
-                                            selected={reqStartDate}
-                                            onChange={(date) => setReqStartDate(date)}
-                                            className="calender"
-                                            name="date"
-                                            dateFormat="dd/MM/yyyy"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="form-group p-2">
+                                <div className="form-group pt-1 px-2">
+                                  <label htmlFor="date" className="form-label">Requirement Start Date</label>
+                                  <input
+                                      type="date"
+                                      className="calendarbox"
+                                      style={{ borderColor: (formSubmitted && startDate === null) ? 'red' : '' }}
+                                      name="date"
+                                      value={startDate ? startDate.toISOString().split('T')[0] : ''}
+                                      onChange={(e) => setStartDate(new Date(Date.parse(e.target.value)))}
+                                  />                                 
+                              </div>
+                                <div className="form-group pt-1 px-2">
                                     <label htmlFor="contact" className="form-label">Client Contact Details</label>
                                     <input 
                                         type="number" 
+                                        style={{ borderColor: (formSubmitted && clientSpocContact.trim() === '') ? 'red' : '' }}
                                         className="input-box" 
+                                        placeholder='eg: 1234567890'
                                         name="contact" 
                                         value={clientSpocContact} 
                                         onChange={(e) => setClientSpocContact(e.target.value)} 
                                     />
                                 </div>
-                                <div className="form-group p-2">
+                                <div className="form-group pt-1 px-2">
                                     <label htmlFor="manager" className="form-label">Account Manager Name</label>
                                     <input 
                                         type="text" 
                                         className="input-box" 
+                                        placeholder='Enter Manager Name'                       
+                                        style={{ borderColor: (formSubmitted && accountManager.trim() === '') ? 'red' : '' }}
                                         name="manager" value={accountManager} 
                                         onChange={(e) => setAccountManager(e.target.value)} 
                                     />
                                 </div>
-                                <div className="form-group p-2">
+                                <div className="form-group pt-1 px-2">
                                     <label htmlFor="email" className="form-label">Account Manager E-mail</label>
                                     <input 
                                         type="email" 
-                                        className="input-box" 
+                                        className="input-box"                                        
+                                        style={{ borderColor: (formSubmitted && accountManagerEmail.trim() === '') ? 'red' : '' }}
                                         name="email" 
+                                        placeholder='eg: abc@company.com'
                                         value={accountManagerEmail} 
                                         onChange={(e) => setAccountManagerEmail(e.target.value)} 
                                         aria-describedby="emailHelp" 
                                     />
                                 </div>
-
-                                <div className="form-group p-2 pb-0 mt-0 position-relative">
+                                <div className="form-group pt-1 px-2 mt-0 position-relative">
                                 <label htmlFor="openings" className="form-label">No. of Openings</label>
                                 <div className="input-container">
                                     <input
                                         type="number"
                                         className="input-box"
                                         name="openings"
+                                        style={{ borderColor: (formSubmitted && noOfOpenings.toString().trim() === '') ? 'red' : '' }}
                                         value={noOfOpenings}
                                         readOnly
                                         aria-describedby="emailHelp"
@@ -465,37 +468,43 @@ const handleAddPosition = () => {
                                     </Tooltip>
                                 </div>
                             </div>
-
-                                {showPopup && (
-                                <SimplePopup onClose={handleClosePopup}>
-                                    <Button onClick={handleAddPosition}>Add Position</Button>
-                                    <div style={{ height: '89%', width: '100%' }}>
-                                    <DataGrid
-                                        rows={positions}
-                                        columns={columns}
-                                        editMode="row"
-                                        rowModesModel={rowModesModel}
-                                        onRowEditStop={(params: any, event: any) => {
-                                          const editEvent = event as { reason: string };
-                                          if (editEvent.reason === GridRowEditStopReasons.escapeKeyDown) {
-                                              setRowModesModel((prevModel: any) => ({
-                                                  ...prevModel,
-                                                  [params.id]: { mode: GridRowModes.View },
-                                              }));
-                                          }
-                                      }} 
-                                      processRowUpdate={processRowUpdate} 
-                                      onRowModesModelChange={setRowModesModel}
-                                    />
-                                    </div>
-                                </SimplePopup>
-                                )}
-                                <div className="form-group row p-2">
+                            {showPopup && (
+                              <SimplePopup onClose={handleClosePopup}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                  <Button onClick={handleAddPosition}>Add Position</Button>
+                                  <IconButton onClick={handleClosePopup} aria-label="close">
+                                    <CloseIcon />
+                                  </IconButton>
+                                </div>
+                                <div style={{ height: '89%', width: '100%' }}>
+                                  <DataGrid
+                                    rows={positions}
+                                    columns={columns}
+                                    editMode="row"
+                                    rowModesModel={rowModesModel}
+                                    onRowEditStop={(params: any, event: any) => {
+                                      const editEvent = event as { reason: string };
+                                      if (editEvent.reason === GridRowEditStopReasons.escapeKeyDown) {
+                                        setRowModesModel((prevModel: any) => ({
+                                          ...prevModel,
+                                          [params.id]: { mode: GridRowModes.View },
+                                        }));
+                                      }
+                                    }} 
+                                    processRowUpdate={processRowUpdate} 
+                                    onRowModesModelChange={setRowModesModel}
+                                  />
+                                </div>
+                              </SimplePopup>
+                            )}
+                                <div className="form-group row p-2 ">
                                     <div className="col">
-                                        <label htmlFor="buget" className="form-label">Salary Budget</label>
+                                        <label htmlFor="buget" className="form-label">Salary </label>
                                         <input 
                                             type="text" 
+                                            style={{ borderColor: (formSubmitted && salaryBudget.trim() === '') ? 'red' : '' }}
                                             className="input-box" 
+                                            placeholder='Enter budget'
                                             name='budget' 
                                             value={salaryBudget} 
                                             onChange={(e) => setSalaryBudget(e.target.value)} 
@@ -506,7 +515,8 @@ const handleAddPosition = () => {
                                         <div className="form-group">
                                             <label htmlFor="modeOfInterview" className="form-label">Mode of Interview</label>
                                             <select 
-                                                className="input-box" 
+                                                className="select-input-box" 
+                                                style={{ borderColor: (formSubmitted && modeOfInterviews.trim() === '') ? 'red' : '' }}
                                                 name="modeOfInterview" 
                                                 value={modeOfInterviews} 
                                                 onChange={(e) => setModeOfInterviews(e.target.value)}                                                                                            >
@@ -518,27 +528,30 @@ const handleAddPosition = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="form-group p-2" style={{ display: showPopup ? 'none' : 'block' }}>
+                                <div className="form-group pt-1 px-2" style={{ display: showPopup ? 'none' : 'block' }}>
                                 <label htmlFor="proj-duration" className="form-label">Project Duration</label>
                                 <div className="input-with-label">
                                     <input 
                                         type="number" 
                                         id='proj-duration'
                                         className="input-box-duration" 
+                                        placeholder='Enter month'
+                                        style={{ borderColor: (formSubmitted && projectStartDate.trim() === '') ? 'red' : '' }}
                                         name="contact" 
                                         value={projectStartDate} 
                                         onChange={(e) => setProjectStartDate(e.target.value)} 
                                         min="1"
                                     />
-                                    <span className="input-months">Months</span>
+                                    {/* <span className="input-months">Months</span> */}
                                 </div>
                             </div>
-
-                            <div className="form-group p-2 mb-2" style={{ display: showPopup ? 'none' : 'block' }}>
+                            <div className="form-group pt-1 mb-3 px-2" style={{ display: showPopup ? 'none' : 'block' }}>
                                 <label htmlFor="email" className="form-label">Approval Request</label>
                                 <input 
                                     type="email" 
-                                    className="input-box-request" 
+                                    className="input-box-request"                             
+                                    placeholder='eg: abc@example.com'
+                                    style={{ borderColor: (formSubmitted && approvedBy.trim() === '') ? 'red' : '' }}
                                     name="email" 
                                     value={approvedBy} 
                                     onChange={(e) => setApprovedBy(e.target.value)} 

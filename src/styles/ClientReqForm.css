@@ -53,6 +53,9 @@
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); 
         background-color: white;
         border-radius: 0px 0px 5px 5px;
+        display: flex;
+        justify-content: end;
+        align-items: end;
         
     }
 
@@ -106,14 +109,13 @@
   .input-box {
     width: 99%;
     padding: 8px;
-    margin-bottom: 10px;
     border: 2px solid #e9e8e8;
     border-radius: 4px;
     min-height: 45px;
   }
 
   .position-input-box{
-    padding: 8px;
+    padding: 5px;
     margin-bottom: 10px;
     border: 2px solid #e9e8e8;
     border-radius: 4px;
@@ -124,7 +126,7 @@
   .role-input-box{
     margin-top: 10px;
     width: 99.5%;
-    padding: 8px;
+    padding: 5px;
     /* margin-bottom: 10px; */
     border: 2px solid #e9e8e8;
     border-radius: 4px;
@@ -151,7 +153,6 @@ input[type="number"] {
     padding-right: 30%;
     padding-left: 10px;
     width: 99%;
-    margin-bottom: 10px;
     border: 2px solid #e9e8e8;
     border-radius: 4px;
     min-height: 45px;
@@ -197,14 +198,19 @@ input[type="number"] {
   }
 
   .btn-save {
-    padding: 10px;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #1976D2;
     color: #fff;
     cursor: pointer;
-    width: 36%;
-    margin: 3% 3% 3% 59%;
+    width: 30%;
+    margin: 10px;
+  }
+
+  .form-group pt-3 p-2{
+    padding-top: 0px;
+    margin-top: 0%;
   }
 
 
@@ -217,20 +223,27 @@ input[type="number"] {
 .text-area:focus {
     outline: none;
     border-color: #e9e8e8; 
- 
+    margin-bottom: 0%;
+    
 }
 
-.input-box:focus,
-.calender:focus,
-.position-input-box:focus,
-.role-input-box:focus,
-.input-box-duration:focus,
-.input-box-request:focus,
-.text-area:focus {
-    border-color: #4A90E2; /* Change this to your desired border color */
+.calendarbox{
+    width: 99%;
+    padding: 8px;
+    border: 2px solid #e9e8e8;
+    border-radius: 4px;
+    min-height: 45px;
+    font-weight: 100;
 }
-
-  
+.select-input-box{
+    width: 99%;
+    padding: 8px;
+    border: 2px solid #e9e8e8;
+    border-radius: 4px;
+    min-height: 45px;
+    font-weight: 100;
+    padding-right: 5px;
+}
   
   hr {
     border: 1px solid black;
