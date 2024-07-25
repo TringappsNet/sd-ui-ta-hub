@@ -1,0 +1,60 @@
+.navbar-brand {
+    cursor: pointer;
+    color: green !important;
+    margin-bottom: 0;
+    padding-left: 100px;
+}
+
+.nav-link {
+    border: none;
+    color: rgb(121, 120, 120);
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+}
+
+.nav-link.active {
+    color: red;
+    /* font-weight: bold; */
+}
+
+.load {
+    display: flex;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-bottom: 1px solid rgb(194, 192, 192);
+}
+
+li {
+    padding-left: 20px;
+    /* padding-top: 10px; */
+}
+
+p > a {
+    text-decoration: none;
+    color: rgb(70, 174, 85);
+}
+
+
+.nav-link.active{
+  color: rgb(0, 0, 0) !important;
+}
+
+.kandash{
+    margin-left: 200px;
+}
+
+
+.small-search-button1{
+    height: 30px;
+    margin-top: 24px;
+}
