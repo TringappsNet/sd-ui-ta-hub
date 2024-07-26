@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import {FastForward} from "lucide-react";
 import { Link } from "react-router-dom";
+import Button from '@mui/material/Button';
 import '../../styles/Navbar.css';
-
+import Form from "./ClientReqForm";
+import MenuPopupState from "../MenuPopupState";
 export default function Navbar(){
     const navItems = [
         { name: 'Candidates', href: '/dashboard/candidates' },
@@ -11,13 +13,25 @@ export default function Navbar(){
         { name: 'Clients', href: '/dashboard/clients' }
     ];
     const [activeLink, setActiveLink] = useState('');
+    const [showForm, setShowForm] = useState(false);
+    const [formKey, setFormKey] = useState(0);
     const handleClick = (linkName) => {
         setActiveLink(linkName);
     };
+    const openForm = (event) => {
+        event.preventDefault();
+        setFormKey((prevKey) => prevKey + 1);
+        setShowForm(true);
+      };
+    
+      const closeForm = () => {
+        setShowForm(false);
+      };
+    
     
     return (
         <nav className="navbar navbar-expand-lg">
-            <div className="container-fluid px-5 py-1 border-bottom flex flex-row align-items-center">
+            <div className="container-fluid px-3 py-1 border-bottom flex flex-row align-items-center">
                 <button className="navbar-toggler collapsed" type="button" data-toggle="collapse" 
                 data-target="#navbarExample" aria-controls="navbarExample" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
@@ -42,15 +56,17 @@ export default function Navbar(){
                     ))}
                 </ul>
                 <div className="px-3 ">
-                    <button className="btn text text-light font-weight-bold px-2 py-1 pb-0 mb-1" >Create</button>
+                    <Button 
+                        className="small-search-button1 mb-1"
+                        variant="contained"
+                        color="primary" 
+                        onClick={openForm} >Create</Button>
+                </div>             
                 </div>
-                
-                <div className="ms-auto mb-0">
-                    <button className="btn btn-primary rounded-circle text font-weight-bold pt-2 " ><span className="">D</span></button>
-
-                </div>
-                </div>
+                <MenuPopupState />
             </div>
+            {showForm && <Form key={formKey} onClose={closeForm} />}
         </nav>
+        
     )
 }
