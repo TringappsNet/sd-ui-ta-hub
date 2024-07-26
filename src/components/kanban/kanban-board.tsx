@@ -13,6 +13,7 @@ import {
  } from "@dnd-kit/core";
  import { arrayMove,rectSortingStrategy,SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
  import Column from "./board-column";
+import Button from "@mui/material/Button";
 
 const KanbanBoard = () => {
   const data = useKanbanStore(state => state.columns);
@@ -234,9 +235,10 @@ const KanbanBoard = () => {
                 tasks={column.tasks}
               ></Column>
             ))}
+            <Button className="h-25  text text-dark font-weight-bold bg-muted">Add New Section</Button>
           </div>
           </SortableContext>
-
+          
         </DndContext>
         </div>
       </>

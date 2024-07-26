@@ -66,7 +66,7 @@ function Login() {
             setSnackbarVariant("success");
             setTimeout(() => {
                 setLoading(false);  // Stop loader before navigation
-                navigate('/board'); 
+                navigate('/dashboard'); 
             }, 2000);
 
         } catch (error) {
