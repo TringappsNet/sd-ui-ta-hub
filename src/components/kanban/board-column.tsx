@@ -37,7 +37,7 @@ const Column: FC<columnType> = ({ id, title, tasks }) => {
       className="bg-light me-3 rounded-sm "
     >
       <SortableContext id={id} items={tasks} strategy={rectSortingStrategy}>
-        <div className="text text-dark sticky-top border-bottom p-2">
+        <div className="text text-dark border-bottom p-2">
             <div className="p-2 border rounded w-100 shadow-sm" >{title}</div></div>
         <div className="overflow-y-auto px-2" style={{height: "60vh",}}>
             {tasks.map((card) => (
