@@ -13,7 +13,7 @@ import React from 'react';
 
 
 
-  const Board = () => {
+  const Board1 = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [columns, setColumns] = useState<columnProps[]>([]);
     const [showAddForm, setShowAddForm] = useState(false);
@@ -383,4 +383,4 @@ import React from 'react';
     
     };
 
-    export default Board;
+    export default Board1;
