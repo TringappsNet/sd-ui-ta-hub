@@ -4,7 +4,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Board1 from "./Dnd";
 import List from './List';
 import Board from './kanban/board';
-
+import Candidates from "./candidates/candidates";
 
 export default function Dashboard(){
     const navigate = useNavigate();
@@ -24,7 +24,7 @@ export default function Dashboard(){
                 <Routes>
                     <Route path="/" element={<Board />} />
                     <Route path="/board" element={<Board1 />}/>
-                    <Route path="/candidates" element={<></>}/>
+                    <Route path="/candidates" element={<Candidates/>}/>
                     <Route path="/positions" element={<></>}/>
                     <Route path="/users" element={<></>}/>
                     <Route path="/clients" element={<></>}/>

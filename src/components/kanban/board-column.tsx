@@ -22,7 +22,7 @@ const Column: FC<columnType> = ({ id, title, tasks }) => {
     transition,
     height: "70vh",
     borderRadius: 5,
-    width: 350,
+    width: 300,
   };
 
   return (
