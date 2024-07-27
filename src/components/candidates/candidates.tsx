@@ -1,10 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import CustomSnackbar from "../../components/CustomSnackbar";
 import {
     GridRowsProp,
     GridRowModesModel,
@@ -27,48 +33,99 @@ import {
     randomArrayItem,
   } from '@mui/x-data-grid-generator';
   import { useCandidateStore, Candidate } from "../../lib/candidateStore";
-//   interface EditToolbarProps {
-//     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-//     setRowModesModel: (
-//       newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
-//     ) => void;
-//   }
-  
-//   function EditToolbar(props: EditToolbarProps) {
-//     const { setRows, setRowModesModel } = props;
-  
-//     const handleClick = () => {
-//       const id = randomId();
-//       setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
-//       setRowModesModel((oldModel) => ({
-//         ...oldModel,
-//         [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-//       }));
-//     };
-  
-//     return (
-//       <GridToolbarContainer>
-//         <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-//           Add record
-//         </Button>
-//       </GridToolbarContainer>
-//     );
-//   }
+import DialogContentText from "@mui/material/DialogContentText";
 
 export default function Candidates(){
-    const { candidates, isLoading, isInitialized, getCandidates, updateCandidate, deleteCandidate } = useCandidateStore();
+    const { candidates, isLoading, isInitialized, getCandidates, updateCandidate, deleteCandidate, addCandidate } = useCandidateStore();
     const [rows, setRows] = React.useState(candidates);
+    const [open, setOpen] = useState(false);
+    const [searchText, setSearchText] = useState('');
+    const [newCandidate, setNewCandidate] = useState({
+        candidateName: '',
+        candidateEmail: '',
+        candidateContact: '',
+        technology: '',
+        totalExperience: '',
+        currentCtc: '',
+        expectedCtc: '',
+        noticePeriod: '',
+        modeOfWork: '',
+        currentLocation: '',
+        candidateStatus: '',
+        recruiter: '',
+        recruitedSource: '',
+        comments: '',
+    });
+    const [snackbar, setSnackbar] = useState({
+      open: false,
+      message: '',
+      variant: 'success'
+  });
     useEffect(() => {
-        if (!isInitialized) {
-            getCandidates();
-            setRows(candidates);
-        }
-        else{
-            setRows(candidates)
-        }
-    }, [isInitialized, getCandidates]);
+      if (!isInitialized) {
+          getCandidates();
+      } else {
+          const filteredRows = candidates.filter(row =>
+              Object.values(row).some(value =>
+                  String(value).toLowerCase().includes(searchText.toLowerCase())
+              )
+          );
+          setRows(filteredRows);
+      }
+  }, [searchText, isInitialized, candidates]);
+  
 //   const candidates = useCandidateStore((state)=> state.candidates)
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [candidateToDelete, setCandidateToDelete] = useState(null); 
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const showSnackbar = (message, variant) => {
+    setSnackbar({ open: true, message, variant });
+};
+
+  const handleDeleteClick = (id: GridRowId) => () => {
+    setCandidateToDelete(id);
+    setDeleteConfirmOpen(true);
+};
+  const handleSearchChange = (event) => {
+    setSearchText(event.target.value);
+};
+
+    const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setNewCandidate({ ...newCandidate, [name]: value });
+    };
+
+    const handleAddCandidate = async () => {
+        try {
+            const addedCandidate = await addCandidate(newCandidate);
+            getCandidates();
+            // setRows([...rows, addedCandidate]);
+            handleClose();
+            setNewCandidate({
+              candidateName: '',
+              candidateEmail: '',
+              candidateContact: '',
+              technology: '',
+              totalExperience: '',   
+              currentCtc: '',
+              expectedCtc: '',
+              noticePeriod: '',
+              modeOfWork: '',
+              currentLocation: '',
+              candidateStatus: '',   
+              recruiter: '',
+              recruitedSource: '',
+              comments: '',
+            }); // Reset form
+            showSnackbar('Candidate added successfully', 'success');
+        } catch (error) {
+            console.error("Error adding candidate:", error);
+            showSnackbar('Error adding candidate', 'error');
+        }
+    };
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     
@@ -86,16 +143,23 @@ export default function Candidates(){
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
-  const handleDeleteClick = (id: GridRowId) => () => {
-    try{
-        deleteCandidate(id as number);
-        console.log("deleted", id);
-        setRows(rows.filter((row) => row.candidateId !== id));
+  const handleConfirmDelete = () => {
+    if (candidateToDelete) {
+        try {
+            deleteCandidate(candidateToDelete as number);
+            setRows(rows.filter((row) => row.candidateId !== candidateToDelete));
+            showSnackbar('Candidate deleted successfully', 'success');
+        } catch (error) {
+            console.log(error);
+            showSnackbar('Error deleting candidate', 'error');
+        }
     }
-    catch(error){
-        console.log(error);
-    }
-  };
+    setDeleteConfirmOpen(false);
+};
+const handleCancelDelete = () => {
+  setDeleteConfirmOpen(false);
+  setCandidateToDelete(null);
+};
 
   const handleCancelClick = (id: GridRowId) => () => {
     setRowModesModel({
@@ -136,11 +200,13 @@ export default function Candidates(){
         console.log("updatedCandidate",updatedCandidate)
     
         setRows(rows.map((row) => row.candidateId === updatedCandidate.candidateId ? updatedCandidate : row));
+        showSnackbar('Candidate updated successfully', 'success');
         console.log("Row updated:", updatedCandidate);
         return updatedCandidate;
     }
     catch(error){
         console.error("Error updating row:", error);
+        showSnackbar('Error updating candidate', 'error');
     }
     
   };
@@ -155,19 +221,17 @@ export default function Candidates(){
 
   console.log("rows",rows);
   const columns: GridColDef[] = [
-    { field: 'candidateName', headerName: 'Candidate Name', width: 100, editable: true, },
-    { field: 'candidateEmail', headerName: 'Email', width: 100, editable: true },
-    { field: 'candidateContact', headerName: 'Contact', width: 100, editable: true },
-    { field: 'technology', headerName: 'Technology', width: 100, editable: true },
-    { field: 'totalExperience', headerName: 'Experience', width: 100, editable: true },
-    { field: 'clientName', headerName: 'Client Name', width: 150, editable: true },
+    { field: 'candidateName', headerName: 'Candidate Name', width: 180, editable: true },
+    { field: 'candidateEmail', headerName: 'Email', width: 200, editable: true },
+    { field: 'candidateContact', headerName: 'Contact', width: 120, editable: true },
+    { field: 'technology', headerName: 'Technology', width: 150, editable: true },
+    { field: 'totalExperience', headerName: 'Experience', width: 120, editable: true },
     { field: 'currentCtc', headerName: 'Current CTC', width: 120, editable: true },
     { field: 'expectedCtc', headerName: 'Expected CTC', width: 120, editable: true },
     { field: 'noticePeriod', headerName: 'Notice Period', width: 120, editable: true },
     { field: 'modeOfWork', headerName: 'Mode of Work', width: 150, editable: true },
     { field: 'currentLocation', headerName: 'Location', width: 150, editable: true },
     { field: 'candidateStatus', headerName: 'Status', width: 120, editable: true },
-    { field: 'taskCandidateStatus', headerName: 'Task Status', width: 120, editable: true },
     { field: 'recruiter', headerName: 'Recruiter', width: 120, editable: true },
     { field: 'recruitedSource', headerName: 'Recruited Source', width: 150, editable: true },
     { field: 'comments', headerName: 'Comments', width: 120, editable: true },
@@ -227,6 +291,7 @@ export default function Candidates(){
         }
 
         return [
+          
           <GridActionsCellItem
             icon={<EditIcon />}
             label="Edit"
@@ -248,18 +313,29 @@ export default function Candidates(){
   ];
     return (
         <>
-            <Box
+                  <Box
             sx={{
                 height: 500,
                 width: '100%',
                 '& .actions': {
-                color: 'text.secondary',
+                    color: 'text.secondary',
                 },
                 '& .textPrimary': {
-                color: 'text.primary',
+                    color: 'text.primary',
                 },
             }}
-            >
+        >
+                <TextField
+                  label="Search"
+                  value={searchText}
+                  onChange={handleSearchChange}
+                  variant="outlined"
+                  sx={{ mb: 3 }}
+                  size='small'
+              />
+                <Button startIcon={<AddIcon />} variant="contained" onClick={handleOpen} sx={{ mt: 0, color: 'white', marginLeft:135 }}>
+                    Add record
+                </Button>
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -270,37 +346,74 @@ export default function Candidates(){
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={handleProcessRowUpdateError}
-                // disableColumnSorting
-                autoPageSize
-                // slots={{
-                // toolbar: EditToolbar as GridSlots['toolbar'],
-                // }}
-                // slotProps={{
-                // toolbar: { setRows, setRowModesModel },
-                // }}
                 sx={{
                     boxShadow: 2,
-                    // border: 2,
-                    borderRadius: 5,
+                    borderRadius: 1,
                     padding: 1,
                     '& .MuiDataGrid-columnHeaders': {
                         borderBottom: '2px solid #e0e0e0',
                         fontSize: 12,
                         fontWeight: 700,
-                        
                     },
-
                     '& .MuiDataGrid-cell': {
                         borderBottom: '1px solid #e0e0e0',
                         fontSize: 14,
                     },
-                    // borderColor: 'primary.light',
                     '& .MuiDataGrid-cell:hover': {
-                      color: 'primary.secondary',
+                        color: 'primary.secondary',
                     },
-                  }}
+                }}
             />
-            </Box>
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Add New Candidate</DialogTitle>
+                <DialogContent>
+                    {columns.filter(col => col.field !== 'actions').map((col) => (
+                        <TextField
+                            key={col.field}
+                            margin="dense"
+                            name={col.field}
+                            label={col.headerName}
+                            type="text"
+                            fullWidth
+                            variant="outlined"
+                            value={newCandidate[col.field] || ''}
+                            onChange={handleInputChange}
+                        />
+                    ))}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleAddCandidate}>Add</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+              open={deleteConfirmOpen}
+              onClose={handleCancelDelete}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+          >
+              <DialogTitle id="alert-dialog-title">
+                  {"Confirm Deletion"}
+              </DialogTitle>
+              <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                      Are you sure you want to delete this candidate?
+                  </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                  <Button onClick={handleCancelDelete}>Cancel</Button>
+                  <Button onClick={handleConfirmDelete} autoFocus>
+                      Delete
+                  </Button>
+              </DialogActions>
+          </Dialog>
+        </Box>
+        <CustomSnackbar
+            open={snackbar.open}
+            message={snackbar.message}
+            variant={snackbar.variant}
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+        />
         </>
     )
 }

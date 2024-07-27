@@ -4,7 +4,7 @@ import { Clear } from '@mui/icons-material'; // Import the Clear icon for close 
 
 const InvitePopup = ({ show, handleClose }) => {
   const [email, setEmail] = useState('');
-  const [roles, setRoles] = useState([]);
+  const [roles, setRoles] = useState<{ role: string; roleId: number }[]>([]);
   const [selectedRole, setSelectedRole] = useState('');
 
   useEffect(() => {

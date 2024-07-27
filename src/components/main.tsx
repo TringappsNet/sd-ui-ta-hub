@@ -4,10 +4,10 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Board1 from "./Dnd";
 import List from './List';
 import Board from './kanban/board';
-import Candidates from "./candidates/candidates";
-import Positions from "./positions/positions";
-import Clients from "./clients/clients";
-import Users from "./users/users";
+import Candidates from "./candidates/candidatesBread";
+import Positions from "./positions/positionBread";
+import Clients from "./clients/clientBread";
+import Users from "./users/userBread";
 
 export default function Dashboard(){
     const navigate = useNavigate();
