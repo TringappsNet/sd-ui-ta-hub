@@ -26,7 +26,7 @@ import {
     randomId,
     randomArrayItem,
   } from '@mui/x-data-grid-generator';
-  import { useCandidateStore, Candidate } from "../../lib/candidateStore";
+  import { useClientStore, Client } from "../../lib/clientStore";
 //   interface EditToolbarProps {
 //     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
 //     setRowModesModel: (
@@ -55,19 +55,19 @@ import {
 //     );
 //   }
 
-export default function Candidates(){
-    const { candidates, isLoading, isInitialized, getCandidates, updateCandidate, deleteCandidate } = useCandidateStore();
-    const [rows, setRows] = React.useState(candidates);
+export default function Clients(){
+    const { clients, isLoading, isInitialized, getClients, updateClient, deleteClient } = useClientStore();
+    const [rows, setRows] = React.useState(clients);
     useEffect(() => {
         if (!isInitialized) {
-            getCandidates();
-            setRows(candidates);
+            getClients();
+            setRows(clients);
         }
         else{
-            setRows(candidates)
+            setRows(clients)
         }
-    }, [isInitialized, getCandidates]);
-//   const candidates = useCandidateStore((state)=> state.candidates)
+    }, [isInitialized, getClients]);
+//   const clients = useCandidateStore((state)=> state.clients)
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
@@ -88,9 +88,9 @@ export default function Candidates(){
 
   const handleDeleteClick = (id: GridRowId) => () => {
     try{
-        deleteCandidate(id as number);
+        deleteClient(id as number);
         console.log("deleted", id);
-        setRows(rows.filter((row) => row.candidateId !== id));
+        setRows(rows.filter((row) => row.clientId !== id));
     }
     catch(error){
         console.log(error);
@@ -103,10 +103,10 @@ export default function Candidates(){
       [id]: { mode: GridRowModes.View, ignoreModifications: true },
     });
 
-    const originalRow = rows.find((row) => row.candidateId === id);
+    const originalRow = rows.find((row) => row.clientId === id);
     if (originalRow) {
         setRows(rows.map((row) => 
-        row.candidateId === id ? { ...originalRow } : row
+        row.clientId === id ? { ...originalRow } : row
         ));
     }
   };
@@ -115,8 +115,8 @@ export default function Candidates(){
     try{
         console.log("newRow", newRow);
         // Find the original row
-        const originalRow = rows.find((row) => row.candidateId === newRow.candidateId);
-        const updatedRow = newRow as Candidate;
+        const originalRow = rows.find((row) => row.clientId === newRow.clientId);
+        const updatedRow = newRow as Client;
         console.log("updated Row", updatedRow);
         if (!originalRow) {
         console.error("Original row not found");
@@ -132,10 +132,10 @@ export default function Candidates(){
         }
     
         // If there are changes, proceed with the update
-        const updatedCandidate = await updateCandidate(updatedRow)
+        const updatedCandidate = await updateClient(updatedRow)
         console.log("updatedCandidate",updatedCandidate)
     
-        setRows(rows.map((row) => row.candidateId === updatedCandidate.candidateId ? updatedCandidate : row));
+        setRows(rows.map((row) => row.clientId === updatedCandidate.clientId ? updatedCandidate : row));
         console.log("Row updated:", updatedCandidate);
         return updatedCandidate;
     }
@@ -155,22 +155,17 @@ export default function Candidates(){
 
   console.log("rows",rows);
   const columns: GridColDef[] = [
-    { field: 'candidateName', headerName: 'Candidate Name', width: 100, editable: true, },
-    { field: 'candidateEmail', headerName: 'Email', width: 100, editable: true },
-    { field: 'candidateContact', headerName: 'Contact', width: 100, editable: true },
-    { field: 'technology', headerName: 'Technology', width: 100, editable: true },
-    { field: 'totalExperience', headerName: 'Experience', width: 100, editable: true },
-    { field: 'clientName', headerName: 'Client Name', width: 150, editable: true },
-    { field: 'currentCtc', headerName: 'Current CTC', width: 120, editable: true },
-    { field: 'expectedCtc', headerName: 'Expected CTC', width: 120, editable: true },
-    { field: 'noticePeriod', headerName: 'Notice Period', width: 120, editable: true },
-    { field: 'modeOfWork', headerName: 'Mode of Work', width: 150, editable: true },
-    { field: 'currentLocation', headerName: 'Location', width: 150, editable: true },
-    { field: 'candidateStatus', headerName: 'Status', width: 120, editable: true },
-    { field: 'taskCandidateStatus', headerName: 'Task Status', width: 120, editable: true },
-    { field: 'recruiter', headerName: 'Recruiter', width: 120, editable: true },
-    { field: 'recruitedSource', headerName: 'Recruited Source', width: 150, editable: true },
-    { field: 'comments', headerName: 'Comments', width: 120, editable: true },
+    { field: 'clientId', headerName: 'CLIENTID', width: 140, editable: true,    
+
+    },
+        { field: 'clientName',headerName: 'CLIENT NAME', width: 140, editable: true ,    
+    },
+        { field: 'clientSpocName',headerName: 'CLIENT SPOC NAME', width: 140, editable: true,    
+    },
+        { field: 'clientSpocContact',headerName: 'CLIENT SPOC CONTACT', width: 200, editable: true ,    
+    },
+        { field: 'clientLocation',headerName: 'CLIENT LOCATION', width: 200, editable: true,    
+    },
     // {
     //   field: 'age',
     //   headerName: 'Age',
@@ -264,7 +259,7 @@ export default function Candidates(){
                 rows={rows}
                 columns={columns}
                 editMode="row"
-                getRowId={(row) => row.candidateId}
+                getRowId={(row) => row.clientId}
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}

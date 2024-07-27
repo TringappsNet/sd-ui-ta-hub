@@ -20,42 +20,10 @@ import {
     GridSlots,
   } from '@mui/x-data-grid';
   import Box from '@mui/material/Box';
-  import {
-    randomCreatedDate,
-    randomTraderName,
-    randomId,
-    randomArrayItem,
-  } from '@mui/x-data-grid-generator';
   import { useCandidateStore, Candidate } from "../../lib/candidateStore";
-//   interface EditToolbarProps {
-//     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-//     setRowModesModel: (
-//       newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
-//     ) => void;
-//   }
-  
-//   function EditToolbar(props: EditToolbarProps) {
-//     const { setRows, setRowModesModel } = props;
-  
-//     const handleClick = () => {
-//       const id = randomId();
-//       setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
-//       setRowModesModel((oldModel) => ({
-//         ...oldModel,
-//         [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-//       }));
-//     };
-  
-//     return (
-//       <GridToolbarContainer>
-//         <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-//           Add record
-//         </Button>
-//       </GridToolbarContainer>
-//     );
-//   }
 
-export default function Candidates(){
+
+export default function Positions(){
     const { candidates, isLoading, isInitialized, getCandidates, updateCandidate, deleteCandidate } = useCandidateStore();
     const [rows, setRows] = React.useState(candidates);
     useEffect(() => {
@@ -155,11 +123,11 @@ export default function Candidates(){
 
   console.log("rows",rows);
   const columns: GridColDef[] = [
-    { field: 'candidateName', headerName: 'Candidate Name', width: 100, editable: true, },
-    { field: 'candidateEmail', headerName: 'Email', width: 100, editable: true },
-    { field: 'candidateContact', headerName: 'Contact', width: 100, editable: true },
-    { field: 'technology', headerName: 'Technology', width: 100, editable: true },
-    { field: 'totalExperience', headerName: 'Experience', width: 100, editable: true },
+    { field: 'candidateName', headerName: 'Candidate Name', width: 180, editable: true },
+    { field: 'candidateEmail', headerName: 'Email', width: 200, editable: true },
+    { field: 'candidateContact', headerName: 'Contact', width: 120, editable: true },
+    { field: 'technology', headerName: 'Technology', width: 150, editable: true },
+    { field: 'totalExperience', headerName: 'Experience', width: 120, editable: true },
     { field: 'clientName', headerName: 'Client Name', width: 150, editable: true },
     { field: 'currentCtc', headerName: 'Current CTC', width: 120, editable: true },
     { field: 'expectedCtc', headerName: 'Expected CTC', width: 120, editable: true },
@@ -217,11 +185,9 @@ export default function Candidates(){
             <GridActionsCellItem
               icon={<CancelIcon />}
               label="Cancel"
-            //   className="textPrimary"
+              className="textPrimary"
               onClick={handleCancelClick(id)}
-              sx={{
-                color: 'error.dark',
-              }}
+              color="inherit"
             />,
           ];
         }
@@ -238,9 +204,7 @@ export default function Candidates(){
             icon={<DeleteIcon />}
             label="Delete"
             onClick={handleDeleteClick(id)}
-            sx={{
-                color: 'error.dark',
-              }}
+            color="inherit"
           />,
         ];
       },
@@ -250,7 +214,7 @@ export default function Candidates(){
         <>
             <Box
             sx={{
-                height: 500,
+                height: 600,
                 width: '100%',
                 '& .actions': {
                 color: 'text.secondary',
@@ -270,35 +234,12 @@ export default function Candidates(){
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={handleProcessRowUpdateError}
-                // disableColumnSorting
-                autoPageSize
                 // slots={{
                 // toolbar: EditToolbar as GridSlots['toolbar'],
                 // }}
                 // slotProps={{
                 // toolbar: { setRows, setRowModesModel },
                 // }}
-                sx={{
-                    boxShadow: 2,
-                    // border: 2,
-                    borderRadius: 5,
-                    padding: 1,
-                    '& .MuiDataGrid-columnHeaders': {
-                        borderBottom: '2px solid #e0e0e0',
-                        fontSize: 12,
-                        fontWeight: 700,
-                        
-                    },
-
-                    '& .MuiDataGrid-cell': {
-                        borderBottom: '1px solid #e0e0e0',
-                        fontSize: 14,
-                    },
-                    // borderColor: 'primary.light',
-                    '& .MuiDataGrid-cell:hover': {
-                      color: 'primary.secondary',
-                    },
-                  }}
             />
             </Box>
         </>

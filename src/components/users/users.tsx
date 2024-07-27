@@ -26,7 +26,7 @@ import {
     randomId,
     randomArrayItem,
   } from '@mui/x-data-grid-generator';
-  import { useCandidateStore, Candidate } from "../../lib/candidateStore";
+  import { useUserStore, User } from "../../lib/usersStore";
 //   interface EditToolbarProps {
 //     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
 //     setRowModesModel: (
@@ -55,19 +55,19 @@ import {
 //     );
 //   }
 
-export default function Candidates(){
-    const { candidates, isLoading, isInitialized, getCandidates, updateCandidate, deleteCandidate } = useCandidateStore();
-    const [rows, setRows] = React.useState(candidates);
+export default function Users(){
+    const { users, isLoading, isInitialized, getUsers, updateUser, deleteUser } = useUserStore();
+    const [rows, setRows] = React.useState(users);
     useEffect(() => {
         if (!isInitialized) {
-            getCandidates();
-            setRows(candidates);
+            getUsers();
+            setRows(users);
         }
         else{
-            setRows(candidates)
+            setRows(users)
         }
-    }, [isInitialized, getCandidates]);
-//   const candidates = useCandidateStore((state)=> state.candidates)
+    }, [isInitialized, getUsers]);
+//   const users = useCandidateStore((state)=> state.users)
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
@@ -88,9 +88,9 @@ export default function Candidates(){
 
   const handleDeleteClick = (id: GridRowId) => () => {
     try{
-        deleteCandidate(id as number);
+        deleteUser(id as number);
         console.log("deleted", id);
-        setRows(rows.filter((row) => row.candidateId !== id));
+        setRows(rows.filter((row) => row.userId !== id));
     }
     catch(error){
         console.log(error);
@@ -103,10 +103,10 @@ export default function Candidates(){
       [id]: { mode: GridRowModes.View, ignoreModifications: true },
     });
 
-    const originalRow = rows.find((row) => row.candidateId === id);
+    const originalRow = rows.find((row) => row.userId === id);
     if (originalRow) {
         setRows(rows.map((row) => 
-        row.candidateId === id ? { ...originalRow } : row
+        row.userId === id ? { ...originalRow } : row
         ));
     }
   };
@@ -115,8 +115,8 @@ export default function Candidates(){
     try{
         console.log("newRow", newRow);
         // Find the original row
-        const originalRow = rows.find((row) => row.candidateId === newRow.candidateId);
-        const updatedRow = newRow as Candidate;
+        const originalRow = rows.find((row) => row.userId === newRow.userId);
+        const updatedRow = newRow as User;
         console.log("updated Row", updatedRow);
         if (!originalRow) {
         console.error("Original row not found");
@@ -132,10 +132,10 @@ export default function Candidates(){
         }
     
         // If there are changes, proceed with the update
-        const updatedCandidate = await updateCandidate(updatedRow)
+        const updatedCandidate = await updateUser(updatedRow)
         console.log("updatedCandidate",updatedCandidate)
     
-        setRows(rows.map((row) => row.candidateId === updatedCandidate.candidateId ? updatedCandidate : row));
+        setRows(rows.map((row) => row.userId === updatedCandidate.userId ? updatedCandidate : row));
         console.log("Row updated:", updatedCandidate);
         return updatedCandidate;
     }
@@ -155,22 +155,13 @@ export default function Candidates(){
 
   console.log("rows",rows);
   const columns: GridColDef[] = [
-    { field: 'candidateName', headerName: 'Candidate Name', width: 100, editable: true, },
-    { field: 'candidateEmail', headerName: 'Email', width: 100, editable: true },
-    { field: 'candidateContact', headerName: 'Contact', width: 100, editable: true },
-    { field: 'technology', headerName: 'Technology', width: 100, editable: true },
-    { field: 'totalExperience', headerName: 'Experience', width: 100, editable: true },
-    { field: 'clientName', headerName: 'Client Name', width: 150, editable: true },
-    { field: 'currentCtc', headerName: 'Current CTC', width: 120, editable: true },
-    { field: 'expectedCtc', headerName: 'Expected CTC', width: 120, editable: true },
-    { field: 'noticePeriod', headerName: 'Notice Period', width: 120, editable: true },
-    { field: 'modeOfWork', headerName: 'Mode of Work', width: 150, editable: true },
-    { field: 'currentLocation', headerName: 'Location', width: 150, editable: true },
-    { field: 'candidateStatus', headerName: 'Status', width: 120, editable: true },
-    { field: 'taskCandidateStatus', headerName: 'Task Status', width: 120, editable: true },
-    { field: 'recruiter', headerName: 'Recruiter', width: 120, editable: true },
-    { field: 'recruitedSource', headerName: 'Recruited Source', width: 150, editable: true },
-    { field: 'comments', headerName: 'Comments', width: 120, editable: true },
+    { field: 'userId', headerName: 'USER ID', width: 140, editable: true, },
+    { field: 'firstName', headerName: 'FIRST NAME', width: 140, editable: true,},
+    { field: 'lastName', headerName: 'LAST NAME', width: 140, editable: true,  },
+    { field: 'username', headerName: 'USERNAME', width: 140, editable: true,  },
+    { field: 'email', headerName: 'EMAIL', width: 200, editable: true,  },
+    { field: 'phone', headerName: 'PHONE', width: 140, editable: true,  },
+    
     // {
     //   field: 'age',
     //   headerName: 'Age',
@@ -195,56 +186,56 @@ export default function Candidates(){
     //   type: 'singleSelect',
     //   valueOptions: ['Market', 'Finance', 'Development'],
     // },
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
-      width: 100,
-      cellClassName: 'actions',
-      getActions: ({ id }) => {
-        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+    // {
+    //   field: 'actions',
+    //   type: 'actions',
+    //   headerName: 'Actions',
+    //   width: 100,
+    //   cellClassName: 'actions',
+    //   getActions: ({ id }) => {
+    //     const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
-        if (isInEditMode) {
-          return [
-            <GridActionsCellItem
-              icon={<SaveIcon />}
-              label="Save"
-              sx={{
-                color: 'primary.main',
-              }}
-              onClick={handleSaveClick(id)}
-            />,
-            <GridActionsCellItem
-              icon={<CancelIcon />}
-              label="Cancel"
-            //   className="textPrimary"
-              onClick={handleCancelClick(id)}
-              sx={{
-                color: 'error.dark',
-              }}
-            />,
-          ];
-        }
+    //     if (isInEditMode) {
+    //       return [
+    //         <GridActionsCellItem
+    //           icon={<SaveIcon />}
+    //           label="Save"
+    //           sx={{
+    //             color: 'primary.main',
+    //           }}
+    //           onClick={handleSaveClick(id)}
+    //         />,
+    //         <GridActionsCellItem
+    //           icon={<CancelIcon />}
+    //           label="Cancel"
+    //         //   className="textPrimary"
+    //           onClick={handleCancelClick(id)}
+    //           sx={{
+    //             color: 'error.dark',
+    //           }}
+    //         />,
+    //       ];
+    //     }
 
-        return [
-          <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            className="textPrimary"
-            onClick={handleEditClick(id)}
-            color="inherit"
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={handleDeleteClick(id)}
-            sx={{
-                color: 'error.dark',
-              }}
-          />,
-        ];
-      },
-    },
+    //     return [
+    //       <GridActionsCellItem
+    //         icon={<EditIcon />}
+    //         label="Edit"
+    //         className="textPrimary"
+    //         onClick={handleEditClick(id)}
+    //         color="inherit"
+    //       />,
+    //       <GridActionsCellItem
+    //         icon={<DeleteIcon />}
+    //         label="Delete"
+    //         onClick={handleDeleteClick(id)}
+    //         sx={{
+    //             color: 'error.dark',
+    //           }}
+    //       />,
+    //     ];
+    //   },
+    // },
   ];
     return (
         <>
@@ -264,7 +255,7 @@ export default function Candidates(){
                 rows={rows}
                 columns={columns}
                 editMode="row"
-                getRowId={(row) => row.candidateId}
+                getRowId={(row) => row.userId}
                 rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}
