@@ -22,7 +22,7 @@ export default function Dashboard(){
     return (
         <div className="dashboard-container">
             <Navbar />
-            <div className="p-4 ">
+            <div className="p-4">
                 
                 <Routes>
                     <Route path="/" element={<Board />} />

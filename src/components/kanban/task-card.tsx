@@ -9,7 +9,7 @@ export type CardType = {
   title: string;
 };
 
-const Card: FC<Task> = ({ id, title, description, columnId }) => {
+const TaskCard: FC<Task> = ({ id, title, description, columnId }) => {
   const { attributes, listeners, setNodeRef, transform } = useSortable({
     id: id
   });
@@ -32,4 +32,4 @@ const Card: FC<Task> = ({ id, title, description, columnId }) => {
   );
 };
 
-export default Card;
+export default TaskCard;

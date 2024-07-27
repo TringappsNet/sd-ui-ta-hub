@@ -1,52 +1,123 @@
-import { FC } from "react";
-import { SortableContext, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
-import { useDroppable } from "@dnd-kit/core";
-import Card, { CardType } from "./task-card";
-import React from "react";
-import { CSS } from "@dnd-kit/utilities";
-import { columnType} from '../../lib/store';
+import React, { useMemo } from 'react';
+import { Card, CardContent, CardHeader, Button, Box } from '@mui/material';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { useDndContext, type UniqueIdentifier } from '@dnd-kit/core';
+import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Task } from '../../lib/store';
+import { ColumnActions } from './column-action';
+import TaskCard from './task-card';
+import { GripVertical } from 'lucide-react';
+export interface Column {
+  id: string;
+  title: string;
+}
 
+export type ColumnType = 'Column';
 
-const Column: FC<columnType> = ({ id, title, tasks }) => {
-  const { setNodeRef: setDroppableNodeRef } = useDroppable({ id: id });
+export interface ColumnDragData {
+  type: ColumnType;
+  column: Column;
+}
+
+interface BoardColumnProps {
+  column: Column;
+  tasks: Task[];
+  isOverlay?: boolean;
+}
+
+export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
+  const tasksIds = useMemo(() => {
+    return tasks.map((task) => task.id);
+  }, [tasks]);
+
   const {
+    setNodeRef,
     attributes,
     listeners,
-    setNodeRef: setSortableNodeRef,
     transform,
     transition,
-  } = useSortable({ id: id });
+    isDragging
+  } = useSortable({
+    id: column.id,
+    data: {
+      type: 'Column',
+      column
+    } as ColumnDragData,
+    attributes: {
+      roleDescription: `Column: ${column.title}`
+    }
+  });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
     transition,
-    height: "70vh",
-    borderRadius: 5,
-    width: 300,
+    transform: CSS.Translate.toString(transform)
   };
 
+  const cardClassName = `h-75vh  bg-light flex-column flex-shrink-0 snap-center me-3 ms-1 ${
+    isOverlay ? 'border border-primary' : isDragging ? 'opacity-30' : ''
+  }`;
+
   return (
-    <div
-      ref={(node) => {
-        setDroppableNodeRef(node);
-        setSortableNodeRef(node);
-      }}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="bg-light me-3 rounded-sm "
-    >
-      <SortableContext id={id} items={tasks} strategy={rectSortingStrategy}>
-        <div className="text text-dark border-bottom p-2">
-            <div className="p-2 border rounded w-100 shadow-sm" >{title}</div></div>
-        <div className="overflow-y-auto px-2" style={{height: "60vh",}}>
-            {tasks.map((card) => (
-                <Card key={card.id} id={card.id} title={card.title} description={card.description} columnId={card.columnId} />
+    <Card ref={setNodeRef} style={style} className={cardClassName} sx={{
+      height: '70vh',
+      weight: '20vw !important' ,
+
+    }}>
+      <CardHeader 
+        className="d-flex flex-row align-items-center border-bottom p-3"
+        title={
+          <Box className="d-flex align-items-center ">
+            {/* <Button
+              
+            >
+              <span className="visually-hidden">{`Move column: ${column.title}`}</span>
+              <DragIndicatorIcon />
+            </Button> */}
+            <GripVertical 
+              {...attributes}
+              {...listeners}
+              className="me-2 p-1 text-muted border-0"
+              style={{ cursor: 'grab' }}
+              size={32}
+              aria-hidden="true"
+
+            />
+
+            <ColumnActions id={column.id} title={column.title} />
+          </Box>
+        }
+      />
+      <CardContent className="d-flex flex-column flex-grow-1 gap-3  p-2">
+        <Box className=" h-100">
+          <SortableContext items={tasksIds}>
+            {tasks.map((task) => (
+              <TaskCard key={task.id} id={task.id} title={task.title} description={undefined} columnId={"1"} />
             ))}
+          </SortableContext>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}
+
+
+export function BoardContainer({ children }: { children: React.ReactNode }) {
+  const dndContext = useDndContext();
+
+  const containerClasses = `
+    px-2 pb-4 d-flex justify-content-lg-start 
+    ${dndContext.active ? '' : 'snap-x snap-mandatory'}
+  `;
+
+  return (
+    <div className="container-fluid">
+      <div className={containerClasses} style={{  whiteSpace: 'nowrap' }}>
+        <div className="d-flex flex-row align-items-start justify-content-center gap-4">
+          {children}
         </div>
-      </SortableContext>
+      </div>
     </div>
   );
-};
-
+}
 export default Column;

@@ -12,7 +12,7 @@ import {
   DragOverEvent,
  } from "@dnd-kit/core";
  import { arrayMove,rectSortingStrategy,SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
- import Column from "./board-column";
+ import Column, { BoardColumn, BoardContainer } from "./board-column";
 import Button from "@mui/material/Button";
 
 const KanbanBoard = () => {
@@ -222,23 +222,29 @@ const KanbanBoard = () => {
           onDragEnd={handleDragEnd}
           onDragOver={handleDragOver}
         >
+          <BoardContainer>
           <SortableContext items={columns.map(col => col.id)} strategy={rectSortingStrategy}>
 
           <div
-            className="d-flex flex-row p-4 overflow-x-auto "
+            className="d-flex flex-row "
           >
             {columns.map((column) => (
-              <Column
+              <BoardColumn
                 key={column.id}
-                id={column.id}
-                title={column.title}
-                tasks={column.tasks}
-              ></Column>
+                // id={column.id}
+                // title={column.title}
+                // tasks={column.tasks}
+                column={column}
+                tasks={column.tasks.filter((task) => task.columnId === column.id)}
+              ></BoardColumn>
             ))}
-            <Button className="h-25  text text-dark font-weight-bold bg-muted">Add New Section</Button>
+            
           </div>
+          <Button className="text text-dark font-weight-bold bg-muted    px-4">Add New Section</Button>
           </SortableContext>
+          </BoardContainer>
           
+
         </DndContext>
         </div>
       </>

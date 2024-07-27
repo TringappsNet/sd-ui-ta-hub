@@ -7,7 +7,7 @@ export type Task = {
   id: string;
   title: string;
   description: string | undefined;
-  columnId: number;
+  columnId: string;
 }
 export type columnType = {
   id: string;
@@ -18,7 +18,28 @@ const defaultCols = [
   {
     id: '2974db54-39ab-4050-884b-89a4693b00c0',
     title: 'Todo',
-    tasks: [],
+    tasks: [
+
+      {
+        id: "2974db54-39ab-405w-884bw",
+        title: "string",
+        description: "string",
+        columnId: '2974db54-39ab-4050-884b-89a4693b00c0',
+      },
+    ],
+  },
+  {
+    id: '2974db54-39ab-405w-884b-89a4693b00c0',
+    title: 'Todo',
+    tasks: [
+
+      {
+        id: "2974db54-39ab-405w-884b-",
+        title: "string",
+        description: "string",
+        columnId: '2974db54-39ab-405w-884b-89a4693b00c0',
+      },
+    ],
   },
   {
     id: '53bd4a28-beb7-447f-96e9-ba4c993f224d',
@@ -61,7 +82,7 @@ export const useKanbanStore = create<State & Actions>()(
               id: "1",
               title,
               description,
-              columnId: 1,
+              columnId: "1",
             }
           ]
         }));
@@ -94,7 +115,7 @@ export const useKanbanStore = create<State & Actions>()(
       initializeStore: async () => {
         const state = get();
         if (!state.isInitialized) {
-          await state.fetchDataFromServer();
+          state.fetchDataFromServer();
         }
       },
     }),
