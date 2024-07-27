@@ -40,7 +40,7 @@ export default function Navbar(){
                 <div className="collapse navbar-collapse" id="navbarExample">
                 <ul className="navbar-nav  px-3">
                     {navItems.map((item, index)=>(
-                        <li className={`nav-item  px-1 ${activeLink === item.name ? 'pb-0' : 'pb-1'}`} key={item.name}>
+                        <li className={`nav-item  px-1 ${activeLink === item.name ? 'pb-0' : 'pb-0'}`} key={item.name}>
                         <Link
                           to={item.href}
                           className={`nav-link text font-weight-bold ${activeLink === item.name ? 'active' : ''}`}

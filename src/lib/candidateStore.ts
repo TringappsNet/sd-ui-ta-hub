@@ -32,7 +32,7 @@ export type State = {
 };
 export type Actions = {
     getCandidates: () => void;
-    addCandidate: (candidate:Candidate) => void;
+    addCandidate: (candidate:Candidate) => Promise<Candidate>;
     updateCandidate: (candidate:Candidate) => Promise<Candidate>;
     deleteCandidate: (candidateId:number) => void;
 
@@ -44,7 +44,7 @@ export const useCandidateStore = create<State & Actions>()(
         isLoading: false,
         isInitialized: false,
         getCandidates: async () => {
-            set({ isLoading: true });
+            set({ isLoading: true, isInitialized: false });
             try {
                 const response = await axios.get(`${backend_url}/api/candidates/`,{
                     headers: {
@@ -67,8 +67,30 @@ export const useCandidateStore = create<State & Actions>()(
             }
             // implementation of getCandidates
         },
-        addCandidate: (candidate: Candidate) => {
-            // implementation of addCandidate
+        addCandidate: async (candidate: Omit<Candidate, 'candidateId'>) => {
+            set({ isLoading: true });
+            try {
+                const response = await axios.post(`${backend_url}/api/candidates/candidate`, candidate, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                    withCredentials: true,
+                });
+                const newCandidate = response.data;
+                
+                set((state) => ({
+                    candidates: [...state.candidates, newCandidate],
+                    isLoading: false,
+                }));
+                
+                console.log('Candidate Added');
+                return newCandidate;
+            } catch (error) {
+                console.error('Error adding candidate:', error);
+                set({ isLoading: false });
+                throw new Error("Failed to add the Candidate");
+            }
         },
         updateCandidate: async (candidate: Candidate) => {
 
