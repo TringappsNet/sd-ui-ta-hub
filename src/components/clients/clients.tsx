@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -27,6 +27,7 @@ import {
     randomArrayItem,
   } from '@mui/x-data-grid-generator';
   import { useClientStore, Client } from "../../lib/clientStore";
+import TextField from "@mui/material/TextField";
 //   interface EditToolbarProps {
 //     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
 //     setRowModesModel: (
@@ -57,6 +58,7 @@ import {
 
 export default function Clients(){
     const { clients, isLoading, isInitialized, getClients, updateClient, deleteClient } = useClientStore();
+    const [searchText, setSearchText] = useState('');
     const [rows, setRows] = React.useState(clients);
     useEffect(() => {
         if (!isInitialized) {
@@ -144,6 +146,9 @@ export default function Clients(){
     }
     
   };
+  const handleSearchChange = (event) => {
+    setSearchText(event.target.value);
+};
 
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
@@ -255,6 +260,17 @@ export default function Clients(){
                 },
             }}
             >
+               <TextField
+                  label="Search"
+                  value={searchText}
+                  onChange={handleSearchChange}
+                  variant="outlined"
+                  sx={{ mb: 3 }}
+                  size='small'
+              />
+                <Button startIcon={<AddIcon />} variant="contained"  sx={{ mt: 0, color: 'white', marginLeft:135 }}>
+                    Add record
+                </Button>
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -276,7 +292,7 @@ export default function Clients(){
                 sx={{
                     boxShadow: 2,
                     // border: 2,
-                    borderRadius: 5,
+                    borderRadius: 1,
                     padding: 1,
                     '& .MuiDataGrid-columnHeaders': {
                         borderBottom: '2px solid #e0e0e0',
