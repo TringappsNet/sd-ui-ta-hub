@@ -6,7 +6,7 @@ import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Task } from '../../lib/store';
 import { ColumnActions } from './column-action';
-import TaskCard from './task-card';
+import {TaskCard} from './task-card';
 import { GripVertical } from 'lucide-react';
 export interface Column {
   id: string;
@@ -92,7 +92,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
         <Box className=" h-100">
           <SortableContext items={tasksIds}>
             {tasks.map((task) => (
-              <TaskCard key={task.id} id={task.id} title={task.title} description={undefined} columnId={"1"} />
+              <TaskCard key={task.id}  task={task} />
             ))}
           </SortableContext>
         </Box>

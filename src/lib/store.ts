@@ -1,126 +1,95 @@
 import { create } from 'zustand';
+import { v4 as uuid } from 'uuid';
 import { persist } from 'zustand/middleware';
-import axios from 'axios';
+import { Column } from '../components/kanban/board-column';
+import { UniqueIdentifier } from '@dnd-kit/core';
 
+export type Status = 'TODO' | 'IN_PROGRESS' | 'DONE';
+
+const defaultCols = [
+  {
+    id: 'TODO' as const,
+    title: 'Todo'
+  }
+] satisfies Column[];
+
+export type ColumnId = (typeof defaultCols)[number]['id'];
 
 export type Task = {
   id: string;
   title: string;
-  description: string | undefined;
-  columnId: string;
-}
-export type columnType = {
-  id: string;
-  title: string;
-  tasks: Task[];
-}
-const defaultCols = [
-  {
-    id: '2974db54-39ab-4050-884b-89a4693b00c0',
-    title: 'Todo',
-    tasks: [
-
-      {
-        id: "2974db54-39ab-405w-884bw",
-        title: "string",
-        description: "string",
-        columnId: '2974db54-39ab-4050-884b-89a4693b00c0',
-      },
-    ],
-  },
-  {
-    id: '2974db54-39ab-405w-884b-89a4693b00c0',
-    title: 'Todo',
-    tasks: [
-
-      {
-        id: "2974db54-39ab-405w-884b-",
-        title: "string",
-        description: "string",
-        columnId: '2974db54-39ab-405w-884b-89a4693b00c0',
-      },
-    ],
-  },
-  {
-    id: '53bd4a28-beb7-447f-96e9-ba4c993f224d',
-    title: 'In progress',
-    tasks: [],
-  }
-] satisfies columnType[];
+  description?: string;
+  status: Status;
+};
 
 export type State = {
   tasks: Task[];
-  columns: columnType[];
-  isLoading: boolean;
-  isInitialized: boolean;
+  columns: Column[];
+  draggedTask: string | null;
 };
+
+const initialTasks: Task[] = [
+  {
+    id: 'task1',
+    status: 'TODO',
+    title: 'Project initiation and planning'
+  },
+  {
+    id: 'task2',
+    status: 'TODO',
+    title: 'Gather requirements from stakeholders'
+  }
+];
+
 export type Actions = {
   addTask: (title: string, description?: string) => void;
   addCol: (title: string) => void;
-  initializeStore: () => void;
-  fetchDataFromServer: () => void;
-  // dragTask: (id: string | null) => void;
-  // removeTask: (title: string) => void;
-  // removeCol: (id: number) => void;
-  // setTasks: (updatedTask: Task[]) => void;
-  // setCols: (cols: Column[]) => void;
-  // updateCol: (id: number, newName: string) => void;
+  dragTask: (id: string | null) => void;
+  removeTask: (title: string) => void;
+  removeCol: (id: UniqueIdentifier) => void;
+  setTasks: (updatedTask: Task[]) => void;
+  setCols: (cols: Column[]) => void;
+  updateCol: (id: UniqueIdentifier, newName: string) => void;
 };
-// Zustand store
-export const useKanbanStore = create<State & Actions>()(
+
+export const useTaskStore = create<State & Actions>()(
   persist(
-    (set, get)=>({
-      tasks: [],
+    (set) => ({
+      tasks: initialTasks,
       columns: defaultCols,
-      isLoading: false,
-      isInitialized: false,
-      addTask: (title, description) => {
+      draggedTask: null,
+      addTask: (title: string, description?: string) =>
         set((state) => ({
           tasks: [
             ...state.tasks,
-            {
-              id: "1",
-              title,
-              description,
-              columnId: "1",
-            }
+            { id: uuid(), title, description, status: 'TODO' }
           ]
-        }));
-      },
-      addCol: (title) => {
+        })),
+      updateCol: (id: UniqueIdentifier, newName: string) =>
         set((state) => ({
-          columns: [...state.columns, { id: "1", title, tasks: [] }]
-        }))
-      },
-      
-
-      fetchDataFromServer: async () => {
-        set({ isLoading: true });
-        try {
-          const response = await axios.get('your-api-endpoint');
-          const data = response.data;
-          
-          set({
-            tasks: data.tasks,
-            columns: data.columns,
-            isLoading: false,
-            isInitialized: true,
-          });
-        } catch (error) {
-          console.error('Error fetching data from server:', error);
-          set({ isLoading: false, isInitialized: true });
-        }
-      },
-
-      initializeStore: async () => {
-        const state = get();
-        if (!state.isInitialized) {
-          state.fetchDataFromServer();
-        }
-      },
+          columns: state.columns.map((col) =>
+            col.id === id ? { ...col, title: newName } : col
+          )
+        })),
+      addCol: (title: string) =>
+        set((state) => ({
+          columns: [
+            ...state.columns,
+            { title, id: state.columns.length ? title.toUpperCase() : 'TODO' }
+          ]
+        })),
+      dragTask: (id: string | null) => set({ draggedTask: id }),
+      removeTask: (id: string) =>
+        set((state) => ({
+          tasks: state.tasks.filter((task) => task.id !== id)
+        })),
+      removeCol: (id: UniqueIdentifier) =>
+        set((state) => ({
+          columns: state.columns.filter((col) => col.id !== id)
+        })),
+      setTasks: (newTasks: Task[]) => set({ tasks: newTasks }),
+      setCols: (newCols: Column[]) => set({ columns: newCols })
     }),
     { name: 'task-store', skipHydration: true }
-    
   )
 );
-

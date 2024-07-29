@@ -3,7 +3,7 @@ import { Button, TextField, Menu, MenuItem, Dialog, DialogActions, DialogContent
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Ellipsis} from 'lucide-react';
 import { Toast, ToastContainer } from 'react-bootstrap';
-import { useKanbanStore } from '../../lib/store';
+import { useTaskStore } from '../../lib/store';
 
 export function ColumnActions({ title, id }) {
   const [name, setName] = useState(title);
@@ -13,8 +13,8 @@ export function ColumnActions({ title, id }) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const updateCol = useKanbanStore((state) => state.updateCol);
-  const removeCol = useKanbanStore((state) => state.removeCol);
+  const updateCol = useTaskStore((state) => state.updateCol);
+  const removeCol = useTaskStore((state) => state.removeCol);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -47,7 +47,7 @@ export function ColumnActions({ title, id }) {
           onChange={(e) => setName(e.target.value)}
           disabled={editDisable}
           inputRef={inputRef}
-          defaultValue="Small"
+          // defaultValue="Small"
           variant="standard"
           size="small"
         />
@@ -73,12 +73,12 @@ export function ColumnActions({ title, id }) {
         }}>
           Rename
         </MenuItem>
-        <MenuItem onClick={() => {
+        { id !="1" && <MenuItem onClick={() => {
           setShowDeleteDialog(true);
           handleClose();
         }} style={{ color: 'red' }}>
           Delete Section
-        </MenuItem>
+        </MenuItem>}
       </Menu>
 
       <Dialog

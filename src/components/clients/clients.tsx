@@ -260,17 +260,19 @@ export default function Clients(){
                 },
             }}
             >
-               <TextField
+               <div className="d-flex flex-row py-2">
+                <TextField
                   label="Search"
                   value={searchText}
                   onChange={handleSearchChange}
                   variant="outlined"
-                  sx={{ mb: 3 }}
                   size='small'
+                  className="me-auto"
               />
-                <Button startIcon={<AddIcon />} variant="contained"  sx={{ mt: 0, color: 'white', marginLeft:135 }}>
+                <Button startIcon={<AddIcon />} variant="contained"  sx={{  color: 'white' }} className="">
                     Add record
                 </Button>
+                </div>
             <DataGrid
                 rows={rows}
                 columns={columns}
