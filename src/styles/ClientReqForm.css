@@ -113,6 +113,22 @@ h3 {
   border-radius: 4px;
   min-height: 45px;
 }
+.input-box::placeholder {
+  color: rgb(193, 191, 191);
+  font-weight: 100;
+}
+input[type="date"]::placeholder {
+  color: rgb(217, 215, 215) !important; 
+}
+.input-box-duration::placeholder {
+  color: rgb(193, 191, 191); 
+}
+.input-box-request::placeholder {
+  color: rgb(193, 191, 191); 
+}
+.option{
+  color: rgb(17, 17, 17); 
+}
 
 .position-input-box{
   padding: 5px;
@@ -156,6 +172,7 @@ input[type="number"] {
   border: 2px solid #e9e8e8;
   border-radius: 4px;
   min-height: 45px;
+  
 }
 
 .input-box-request {
@@ -234,6 +251,7 @@ margin-top: 0.25em;
   border-radius: 4px;
   min-height: 45px;
   font-weight: 100;
+  /* color: rgb(193, 191, 191);  */
 }
 .select-input-box{
   width: 99%;
@@ -241,6 +259,9 @@ margin-top: 0.25em;
   border: 2px solid #e9e8e8;
   border-radius: 4px;
   min-height: 45px;
+  font-weight: 100;
+  color: rgb(163, 161, 161); /* You can use any color you prefer */
+  /* opacity: 0.9;  */
   font-weight: 100;
 }
 
