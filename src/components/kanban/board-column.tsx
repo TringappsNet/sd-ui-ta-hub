@@ -10,7 +10,7 @@ import {TaskCard} from './task-card';
 import { GripVertical } from 'lucide-react';
 export interface Column {
   id: string;
-  title: string;
+  column: string;
 }
 
 export type ColumnType = 'Column';
@@ -45,7 +45,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
       column
     } as ColumnDragData,
     attributes: {
-      roleDescription: `Column: ${column.title}`
+      roleDescription: `Column: ${column.column}`
     }
   });
 
@@ -84,7 +84,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
 
             />
 
-            <ColumnActions id={column.id} title={column.title} />
+            <ColumnActions id={column.id} title={column.column} />
           </Box>
         }
       />

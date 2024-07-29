@@ -32,9 +32,9 @@ export function ColumnActions({ title, id }) {
     setShowToast(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setShowDeleteDialog(false);
-    removeCol(id);
+    await removeCol(id);
     setToastMessage('This column has been deleted.');
     setShowToast(true);
   };
