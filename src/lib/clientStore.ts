@@ -20,7 +20,7 @@ export type State = {
 };
 export type Actions = {
     getClients: () => void;
-    addClient: (client:Client) => void;
+    addClient: (client:Client) => Promise<Client>;
     updateClient: (client:Client) => Promise<Client>;
     deleteClient: (clientId:number) => void;
 
@@ -32,7 +32,7 @@ export const useClientStore = create<State & Actions>()(
         isLoading: false,
         isInitialized: false,
         getClients: async () => {
-            set({ isLoading: true });
+            set({ isLoading: true, isInitialized: false });
             try {
                 const response = await axios.get(`${backend_url}/api/clients/`,{
                     headers: {
@@ -42,7 +42,6 @@ export const useClientStore = create<State & Actions>()(
                     withCredentials: true,
                 });
                 const data = response.data;
-                
                 set({
                     clients: data,
                     isLoading: false,
@@ -55,9 +54,34 @@ export const useClientStore = create<State & Actions>()(
             }
             // implementation of getClients
         },
-        addClient: (client: Client) => {
-            // implementation of addClient
-        },
+        addClient: async (client: Omit<Client, 'clientId' | 'createdAt' | 'lastUpdated'>) => {
+            set({ isLoading: true });
+            try {
+              const response = await axios.post(`${backend_url}/api/clients/client`, client, {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+                },
+                withCredentials: true,
+              });
+              const newClient = response.data;
+            //   set((state) => ({
+            //     clients: [...state.clients, newClient],
+            //     isLoading: false,
+            //   }));
+              if(response.status == 200) {
+                  get().getClients();
+                  set({ isLoading: false });
+              }
+              console.log('Client Added');
+              return newClient;
+            } catch (error) {
+              console.error('Error adding client:', error);
+              set({ isLoading: false });
+              throw new Error("Failed to add the Client");
+            }
+          },
+      
         updateClient: async (client: Client) => {
 
             // implementation of updateClient

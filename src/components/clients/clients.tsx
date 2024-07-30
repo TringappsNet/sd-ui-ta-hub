@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Close';
+import CustomSnackbar from "../../components/CustomSnackbar";
 import {
     GridRowsProp,
     GridRowModesModel,
@@ -28,38 +29,26 @@ import {
   } from '@mui/x-data-grid-generator';
   import { useClientStore, Client } from "../../lib/clientStore";
 import TextField from "@mui/material/TextField";
-//   interface EditToolbarProps {
-//     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-//     setRowModesModel: (
-//       newModel: (oldModel: GridRowModesModel) => GridRowModesModel,
-//     ) => void;
-//   }
-  
-//   function EditToolbar(props: EditToolbarProps) {
-//     const { setRows, setRowModesModel } = props;
-  
-//     const handleClick = () => {
-//       const id = randomId();
-//       setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
-//       setRowModesModel((oldModel) => ({
-//         ...oldModel,
-//         [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-//       }));
-//     };
-  
-//     return (
-//       <GridToolbarContainer>
-//         <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-//           Add record
-//         </Button>
-//       </GridToolbarContainer>
-//     );
-//   }
+import { Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material';
 
 export default function Clients(){
-    const { clients, isLoading, isInitialized, getClients, updateClient, deleteClient } = useClientStore();
+    const { clients, isLoading, isInitialized, getClients, updateClient, deleteClient, addClient } = useClientStore();
     const [searchText, setSearchText] = useState('');
     const [rows, setRows] = React.useState(clients);
+    // type DeleteConfirmationState = {
+    //   open: boolean;
+    //   id: GridRowId | null;
+    // };
+    const [deleteConfirmation, setDeleteConfirmation] = useState({ open: false, id: null });
+    const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+    const [openAddForm, setOpenAddForm] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', variant: 'success' });
+    const [newClient, setNewClient] = useState({
+        clientName: '',
+        clientSpocName: '',
+        clientSpocContact: '',
+        clientLocation: '',
+    });
     useEffect(() => {
         if (!isInitialized) {
             getClients();
@@ -68,9 +57,61 @@ export default function Clients(){
         else{
             setRows(clients)
         }
-    }, [isInitialized, getClients]);
-//   const clients = useCandidateStore((state)=> state.clients)
-  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+    }, [isInitialized, getClients, clients]);
+    useEffect(() => {
+      if (isInitialized) {
+          const filteredRows = clients.filter(client =>
+              Object.values(client).some(value =>
+                  String(value).toLowerCase().includes(searchText.toLowerCase())
+              )
+          );
+          setRows(filteredRows);
+      }
+  }, [searchText, isInitialized, clients]);
+  
+  const showSnackbar = (message, variant) => {
+    setSnackbar({ open: true, message, variant });
+  };
+  const closeSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+  const handleAddClick = () => {
+    setOpenAddForm(true);
+  };
+  const handleCloseAddForm = () => {
+    setOpenAddForm(false);
+    getClients();
+    setNewClient({
+        clientName: '',
+        clientSpocName: '',
+        clientSpocContact: '',
+        clientLocation: '',
+    });
+};
+  const handleChange = (event) => {
+  const { name, value } = event.target;
+  setNewClient((prev) => ({ ...prev, [name]: value }));
+};
+
+const handleSubmit = async () => {
+  if (!areAllFieldsFilled()) {
+    showSnackbar('Please fill all the fields', 'error');
+    return;
+}  
+  try {
+      const addedClient = await addClient(newClient);
+      getClients();
+      setRows((prevRows) => [...prevRows, addedClient]);
+      handleCloseAddForm();
+      showSnackbar('Client added successfully', 'success');
+  } catch (error) {
+      console.error("Error adding client:", error);
+      showSnackbar('Error adding client', 'error');
+  }
+};
+const areAllFieldsFilled = () => {
+  return Object.values(newClient).every(value => value !== '');
+};
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     
@@ -87,16 +128,26 @@ export default function Clients(){
   const handleSaveClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
-
   const handleDeleteClick = (id: GridRowId) => () => {
-    try{
-        deleteClient(id as number);
-        console.log("deleted", id);
-        setRows(rows.filter((row) => row.clientId !== id));
-    }
-    catch(error){
+    setDeleteConfirmation({ open: true, id });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteConfirmation.id) {
+      try {
+        deleteClient(deleteConfirmation.id as number);
+        setRows(rows.filter((row) => row.clientId !== deleteConfirmation.id));
+        showSnackbar('Client deleted successfully', 'success');
+      } catch (error) {
         console.log(error);
+        showSnackbar('Error deleting client', 'error');
+      }
     }
+    setDeleteConfirmation({ open: false, id: null });
+  };
+  
+  const handleCancelDelete = () => {
+    setDeleteConfirmation({ open: false, id: null });
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -124,7 +175,6 @@ export default function Clients(){
         console.error("Original row not found");
         return newRow; // Return newRow to avoid errors, but you might want to handle this case differently
         }
-    
         // Check if there are any differences
         const hasChanges = Object.keys(newRow).some(key => newRow[key] !== originalRow[key]);
     
@@ -138,11 +188,13 @@ export default function Clients(){
         console.log("updatedCandidate",updatedCandidate)
     
         setRows(rows.map((row) => row.clientId === updatedCandidate.clientId ? updatedCandidate : row));
+        showSnackbar('Client updated successfully', 'success');
         console.log("Row updated:", updatedCandidate);
         return updatedCandidate;
     }
     catch(error){
         console.error("Error updating row:", error);
+        showSnackbar('Error updating client', 'error');
     }
     
   };
@@ -160,46 +212,18 @@ export default function Clients(){
 
   console.log("rows",rows);
   const columns: GridColDef[] = [
-    { field: 'clientId', headerName: 'CLIENTID', width: 140, editable: true,    
-
-    },
-        { field: 'clientName',headerName: 'CLIENT NAME', width: 140, editable: true ,    
-    },
-        { field: 'clientSpocName',headerName: 'CLIENT SPOC NAME', width: 140, editable: true,    
-    },
-        { field: 'clientSpocContact',headerName: 'CLIENT SPOC CONTACT', width: 200, editable: true ,    
-    },
-        { field: 'clientLocation',headerName: 'CLIENT LOCATION', width: 200, editable: true,    
-    },
-    // {
-    //   field: 'age',
-    //   headerName: 'Age',
-    //   type: 'number',
-    //   width: 80,
-    //   align: 'left',
-    //   headerAlign: 'left',
-    //   editable: true,
-    // },
-    // {
-    //   field: 'joinDate',
-    //   headerName: 'Join date',
-    //   type: 'date',
-    //   width: 180,
-    //   editable: true,
-    // },
-    // {
-    //   field: 'role',
-    //   headerName: 'Department',
-    //   width: 220,
-    //   editable: true,
-    //   type: 'singleSelect',
-    //   valueOptions: ['Market', 'Finance', 'Development'],
-    // },
+    { field: 'clientId', headerName: 'Client Id', width: 240, editable: true, headerClassName: 'column-header'},
+    { field: 'clientName',headerName: 'Client Name', width: 240, editable: true , headerClassName: 'column-header'},
+    { field: 'clientSpocName',headerName: 'Client Spoc Name', width: 240, editable: true, headerClassName: 'column-header'},
+    { field: 'clientSpocContact',headerName: 'client Spoc Contact', width: 240, editable: true , headerClassName: 'column-header'},
+    { field: 'clientLocation',headerName: 'Client Location', width: 240, editable: true, headerClassName: 'column-header'},
     {
       field: 'actions',
       type: 'actions',
+      headerClassName: 'column-header',
       headerName: 'Actions',
-      width: 100,
+      width: 238,
+      pinnable: true,
       cellClassName: 'actions',
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
@@ -269,7 +293,7 @@ export default function Clients(){
                   size='small'
                   className="me-auto"
               />
-                <Button startIcon={<AddIcon />} variant="contained"  sx={{  color: 'white' }} className="">
+                <Button startIcon={<AddIcon />} variant="contained"  sx={{  color: 'white' }} onClick={handleAddClick}>
                     Add record
                 </Button>
                 </div>
@@ -283,35 +307,101 @@ export default function Clients(){
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={handleProcessRowUpdateError}
-                // disableColumnSorting
-                autoPageSize
-                // slots={{
-                // toolbar: EditToolbar as GridSlots['toolbar'],
-                // }}
-                // slotProps={{
-                // toolbar: { setRows, setRowModesModel },
-                // }}
                 sx={{
-                    boxShadow: 2,
-                    // border: 2,
-                    borderRadius: 1,
-                    padding: 1,
-                    '& .MuiDataGrid-columnHeaders': {
-                        borderBottom: '2px solid #e0e0e0',
-                        fontSize: 12,
-                        fontWeight: 700,
-                        
-                    },
-
-                    '& .MuiDataGrid-cell': {
-                        borderBottom: '1px solid #e0e0e0',
-                        fontSize: 14,
-                    },
-                    // borderColor: 'primary.light',
-                    '& .MuiDataGrid-cell:hover': {
+                  boxShadow: 2,
+                  borderRadius: 1,
+                  '& .MuiDataGrid-columnHeaders': {
+                      borderBottom: '2px solid #e0e0e0',
+                      fontSize: 14,
+                      fontWeight: 700,
+                  },
+                  '& .MuiDataGrid-cell': {
+                      borderBottom: '1px solid #e0e0e0',
+                      fontSize: 13,
+                      paddingLeft: 2,
+                  },
+                  '& .MuiDataGrid-cell:hover': {
                       color: 'primary.secondary',
-                    },
-                  }}
+                  },
+              }}
+            />
+            <Dialog open={openAddForm} onClose={handleCloseAddForm}>
+                <DialogTitle>Add New Client</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        name="clientName"
+                        label="Client Name"
+                        style={{ width: '250px' }}
+                        type="text"
+                        variant="outlined"
+                        value={newClient.clientName}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Client SPOC Name"
+                        name="clientSpocName"
+                        type="text"
+                        variant="outlined"
+                        InputLabelProps={{
+                          style: { paddingLeft: '25px' }, 
+                      }}
+                        style={{ paddingLeft: '20px', width: '300px' }}
+                        value={newClient.clientSpocName}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Client SPOC Contact"
+                        name="clientSpocContact"
+                        type="number"
+                        fullWidth
+                        variant="outlined"
+                        value={newClient.clientSpocContact}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="clientLocation"
+                        label="Client Location"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        value={newClient.clientLocation}
+                        onChange={handleChange}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseAddForm}>Cancel</Button>
+                    <Button onClick={handleSubmit}>Add</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+              open={deleteConfirmation.open}
+              onClose={handleCancelDelete}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Are you sure you want to delete this client?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCancelDelete}>Cancel</Button>
+                <Button onClick={handleConfirmDelete} autoFocus>
+                  Confirm
+                </Button>
+              </DialogActions>
+            </Dialog>
+            <CustomSnackbar
+              open={snackbar.open}
+              message={snackbar.message}
+              variant={snackbar.variant}
+              onClose={closeSnackbar}
             />
             </Box>
         </>

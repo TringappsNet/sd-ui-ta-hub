@@ -37,7 +37,7 @@ export default function NewSectionDialog() {
       <Button
         variant="outlined"
         onClick={handleClickOpen}
-        className="w-100"
+        // className="w-100"
         size="large"
       >
         ＋ Add New Section

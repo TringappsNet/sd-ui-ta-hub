@@ -523,10 +523,10 @@ const handleAddPosition = () => {
                                                 name="modeOfInterview" 
                                                 value={modeOfInterviews} 
                                                 onChange={(e) => setModeOfInterviews(e.target.value)}                                                                                            >
-                                                <option value="">Select an option</option>
-                                                <option value="option1">In-Person </option>
-                                                <option value="option2">Online </option>
-                                                <option value="option3">Group </option>
+                                                <option className='select-option'>Select an option</option>
+                                                <option value="option1" className="select-option">In-Person </option>
+                                                <option value="option2" className="select-option">Online </option>
+                                                <option value="option3" className="select-option">Group </option>
                                             </select>
                                         </div>
                                     </div>

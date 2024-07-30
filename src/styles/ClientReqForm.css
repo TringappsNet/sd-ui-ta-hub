@@ -33,7 +33,21 @@ top: 0px;
 z-index:20;
 }
 
-
+.input-box::placeholder{
+  color: #b7b6b6;
+}
+.select-input-box{
+  color: #b7b6b6;
+}
+.input-box-duration::placeholder{
+  color: #b7b6b6;
+}
+.input-box-request::placeholder{
+  color: #b7b6b6;
+}
+.select-option{
+  color: black;
+}
 .header-form {
 display: flex;
 justify-content: space-between;
