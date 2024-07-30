@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import classNames from 'classnames';
 import { Active, DataRef, Over } from '@dnd-kit/core';
 import { ColumnDragData } from '../components/kanban/board-column';
-import { TaskDragData } from '@/components/kanban/task-card';
+import { TaskDragData } from '../components/kanban/task-card';
 
 type DraggableData = ColumnDragData | TaskDragData;
 
