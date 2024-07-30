@@ -78,11 +78,6 @@ export const useCandidateStore = create<State & Actions>()(
                     withCredentials: true,
                 });
                 const newCandidate = response.data;
-                
-                // set((state) => ({
-                //     candidates: [...state.candidates, newCandidate],
-                //     isLoading: false,
-                // }));
                 if(response.status == 200){
                     get().getCandidates();
                     set({isLoading: false,});

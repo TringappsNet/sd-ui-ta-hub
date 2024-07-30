@@ -64,20 +64,26 @@ export default function Candidates(){
     useEffect(() => {
       if (!isInitialized) {
           getCandidates();
+          setRows(candidates);
       } else {
-          const filteredRows = candidates.filter(row =>
-              Object.values(row).some(value =>
-                  String(value).toLowerCase().includes(searchText.toLowerCase())
-              )
-          );
-          setRows(filteredRows);
+        setRows(candidates);
       }
-  }, [searchText, isInitialized, candidates]);
+  }, [ isInitialized, candidates]);
+
+    useEffect(() => {
+    if (isInitialized) {
+        const filteredRows = candidates.filter(row =>
+            Object.values(row).some(value =>
+                String(value).toLowerCase().includes(searchText.toLowerCase())
+            )
+        );
+        setRows(filteredRows);
+    }
+}, [searchText, isInitialized, candidates]);
   
-//   const candidates = useCandidateStore((state)=> state.candidates)
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [candidateToDelete, setCandidateToDelete] = useState(null); 
+  const [candidateToDelete, setCandidateToDelete] = useState<GridRowId | null>(null); 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -99,12 +105,15 @@ export default function Candidates(){
     };
 
     const handleAddCandidate = async () => {
-        try {
-            const addedCandidate = await addCandidate(newCandidate);
-            getCandidates();
-            // setRows([...rows, addedCandidate]);
-            handleClose();
-            setNewCandidate({
+      if (!areAllFieldsFilled()) {
+          showSnackbar('Please fill all the fields', 'error');
+          return;
+      }  
+      try {
+          const addedCandidate = await addCandidate(newCandidate);
+          getCandidates();
+          handleClose();
+          setNewCandidate({
               candidateName: '',
               candidateEmail: '',
               candidateContact: '',
@@ -119,13 +128,16 @@ export default function Candidates(){
               recruiter: '',
               recruitedSource: '',
               comments: '',
-            }); // Reset form
-            showSnackbar('Candidate added successfully', 'success');
-        } catch (error) {
-            console.error("Error adding candidate:", error);
-            showSnackbar('Error adding candidate', 'error');
-        }
-    };
+          });
+          showSnackbar('Candidate added successfully', 'success');
+      } catch (error) {
+          console.error("Error adding candidate:", error);
+          showSnackbar('Error adding candidate', 'error');
+      }
+  };
+  const areAllFieldsFilled = () => {
+    return Object.values(newCandidate).every(value => value !== '');
+};
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     
@@ -235,36 +247,12 @@ const handleCancelDelete = () => {
     { field: 'recruiter', headerName: 'Recruiter', width: 120, editable: true, headerClassName: 'column-header' },
     { field: 'recruitedSource', headerName: 'Recruited Source', width: 150, editable: true, headerClassName: 'column-header' },
     { field: 'comments', headerName: 'Comments', width: 120, editable: true, headerClassName: 'column-header' },
-    // {
-    //   field: 'age',
-    //   headerName: 'Age',
-    //   type: 'number',
-    //   width: 80,
-    //   align: 'left',
-    //   headerAlign: 'left',
-    //   editable: true,
-    // },
-    // {
-    //   field: 'joinDate',
-    //   headerName: 'Join date',
-    //   type: 'date',
-    //   width: 180,
-    //   editable: true,
-    // },
-    // {
-    //   field: 'role',
-    //   headerName: 'Department',
-    //   width: 220,
-    //   editable: true,
-    //   type: 'singleSelect',
-    //   valueOptions: ['Market', 'Finance', 'Development'],
-    // },
     {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
       headerClassName: 'column-header',
-      width: 100,
+      width: 119,
       cellClassName: 'actions',
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
@@ -282,7 +270,6 @@ const handleCancelDelete = () => {
             <GridActionsCellItem
               icon={<CancelIcon />}
               label="Cancel"
-            //   className="textPrimary"
               onClick={handleCancelClick(id)}
               sx={{
                 color: 'error.dark',
@@ -355,12 +342,13 @@ const handleCancelDelete = () => {
                     borderRadius: 1,
                     '& .MuiDataGrid-columnHeaders': {
                         borderBottom: '2px solid #e0e0e0',
-                        fontSize: 13,
-                        fontWeight: 800,
+                        fontSize: 14,
+                        fontWeight: 700,
                     },
                     '& .MuiDataGrid-cell': {
                         borderBottom: '1px solid #e0e0e0',
                         fontSize: 13,
+                        paddingLeft: 2,
                     },
                     '& .MuiDataGrid-cell:hover': {
                         color: 'primary.secondary',
@@ -369,33 +357,33 @@ const handleCancelDelete = () => {
                 }}
             />
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Add New Candidate</DialogTitle>
-                <DialogContent>
-                    {columns.filter(col => col.field !== 'actions').map((col) => (
-                        <TextField
-                            key={col.field}
-                            margin="dense"
-                            name={col.field}
-                            label={col.headerName}
-                            type="text"
-                            fullWidth
-                            variant="outlined"                           
-                            value={newCandidate[col.field] || ''}
-                            onChange={handleInputChange}
-                        />
-                    ))}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleAddCandidate}>Add</Button>
-                </DialogActions>
-            </Dialog>
+            <DialogTitle>Add New Candidate</DialogTitle>
+            <DialogContent>
+                {columns.filter(col => col.field !== 'actions').map((col) => (
+                    <TextField
+                        key={col.field}
+                        margin="dense"
+                        name={col.field}
+                        label={col.headerName}
+                        type="text"
+                        fullWidth
+                        variant="outlined"                           
+                        value={newCandidate[col.field] || ''}
+                        onChange={handleInputChange}
+                    />
+                ))}
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleAddCandidate}>Add</Button>
+            </DialogActions>
+          </Dialog>
             <Dialog
               open={deleteConfirmOpen}
               onClose={handleCancelDelete}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
-          >
+            >
               <DialogTitle id="alert-dialog-title">
                   {"Confirm Deletion"}
               </DialogTitle>

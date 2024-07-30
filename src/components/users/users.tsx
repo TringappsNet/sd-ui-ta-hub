@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -27,6 +27,7 @@ import {
     randomArrayItem,
   } from '@mui/x-data-grid-generator';
   import { useUserStore, User } from "../../lib/usersStore";
+import TextField from "@mui/material/TextField";
 //   interface EditToolbarProps {
 //     setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
 //     setRowModesModel: (
@@ -58,6 +59,7 @@ import {
 export default function Users(){
     const { users, isLoading, isInitialized, getUsers, updateUser, deleteUser } = useUserStore();
     const [rows, setRows] = React.useState(users);
+    const [searchText, setSearchText] = useState('');
     useEffect(() => {
         if (!isInitialized) {
             getUsers();
@@ -67,8 +69,21 @@ export default function Users(){
             setRows(users)
         }
     }, [isInitialized, getUsers]);
-//   const users = useCandidateStore((state)=> state.users)
+    useEffect(() => {
+      if (isInitialized) {
+          const filteredRows = users.filter(row =>
+              Object.values(row).some(value =>
+                  String(value).toLowerCase().includes(searchText.toLowerCase())
+              )
+          );
+          setRows(filteredRows);
+      }
+  }, [searchText, isInitialized, users]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+
+  const handleSearchChange = (event) => {
+    setSearchText(event.target.value);
+};
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     
@@ -155,87 +170,13 @@ export default function Users(){
 
   console.log("rows",rows);
   const columns: GridColDef[] = [
-    { field: 'userId', headerName: 'USER ID', width: 140, editable: true, },
-    { field: 'firstName', headerName: 'FIRST NAME', width: 140, editable: true,},
-    { field: 'lastName', headerName: 'LAST NAME', width: 140, editable: true,  },
-    { field: 'username', headerName: 'USERNAME', width: 140, editable: true,  },
-    { field: 'email', headerName: 'EMAIL', width: 200, editable: true,  },
-    { field: 'phone', headerName: 'PHONE', width: 140, editable: true,  },
-    
-    // {
-    //   field: 'age',
-    //   headerName: 'Age',
-    //   type: 'number',
-    //   width: 80,
-    //   align: 'left',
-    //   headerAlign: 'left',
-    //   editable: true,
-    // },
-    // {
-    //   field: 'joinDate',
-    //   headerName: 'Join date',
-    //   type: 'date',
-    //   width: 180,
-    //   editable: true,
-    // },
-    // {
-    //   field: 'role',
-    //   headerName: 'Department',
-    //   width: 220,
-    //   editable: true,
-    //   type: 'singleSelect',
-    //   valueOptions: ['Market', 'Finance', 'Development'],
-    // },
-    // {
-    //   field: 'actions',
-    //   type: 'actions',
-    //   headerName: 'Actions',
-    //   width: 100,
-    //   cellClassName: 'actions',
-    //   getActions: ({ id }) => {
-    //     const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-
-    //     if (isInEditMode) {
-    //       return [
-    //         <GridActionsCellItem
-    //           icon={<SaveIcon />}
-    //           label="Save"
-    //           sx={{
-    //             color: 'primary.main',
-    //           }}
-    //           onClick={handleSaveClick(id)}
-    //         />,
-    //         <GridActionsCellItem
-    //           icon={<CancelIcon />}
-    //           label="Cancel"
-    //         //   className="textPrimary"
-    //           onClick={handleCancelClick(id)}
-    //           sx={{
-    //             color: 'error.dark',
-    //           }}
-    //         />,
-    //       ];
-    //     }
-
-    //     return [
-    //       <GridActionsCellItem
-    //         icon={<EditIcon />}
-    //         label="Edit"
-    //         className="textPrimary"
-    //         onClick={handleEditClick(id)}
-    //         color="inherit"
-    //       />,
-    //       <GridActionsCellItem
-    //         icon={<DeleteIcon />}
-    //         label="Delete"
-    //         onClick={handleDeleteClick(id)}
-    //         sx={{
-    //             color: 'error.dark',
-    //           }}
-    //       />,
-    //     ];
-    //   },
-    // },
+    { field: 'userId', headerName: 'User Id', width: 240, editable: true, headerClassName: 'column-header' },
+    { field: 'firstName', headerName: 'First Name', width: 240, editable: true, headerClassName: 'column-header'},
+    { field: 'lastName', headerName: 'Last Name', width: 240, editable: true, headerClassName: 'column-header' },
+    { field: 'username', headerName: 'Username', width: 240, editable: true, headerClassName: 'column-header' },
+    { field: 'email', headerName: 'Email', width: 240, editable: true, headerClassName: 'column-header' },
+    { field: 'phone', headerName: 'Phone', width: 238, editable: true, headerClassName: 'column-header' },
+ 
   ];
     return (
         <>
@@ -251,6 +192,16 @@ export default function Users(){
                 },
             }}
             >
+              <div className="d-flex flex-row py-2">
+               <TextField
+                  label="Search"
+                  value={searchText}
+                  onChange={handleSearchChange}
+                  variant="outlined"
+                  size='small'
+                  className="me-auto"
+                />
+               </div> 
             <DataGrid
                 rows={rows}
                 columns={columns}
@@ -261,35 +212,23 @@ export default function Users(){
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={handleProcessRowUpdateError}
-                // disableColumnSorting
-                autoPageSize
-                // slots={{
-                // toolbar: EditToolbar as GridSlots['toolbar'],
-                // }}
-                // slotProps={{
-                // toolbar: { setRows, setRowModesModel },
-                // }}
                 sx={{
-                    boxShadow: 2,
-                    // border: 2,
-                    borderRadius: 5,
-                    padding: 1,
-                    '& .MuiDataGrid-columnHeaders': {
-                        borderBottom: '2px solid #e0e0e0',
-                        fontSize: 12,
-                        fontWeight: 700,
-                        
-                    },
-
-                    '& .MuiDataGrid-cell': {
-                        borderBottom: '1px solid #e0e0e0',
-                        fontSize: 14,
-                    },
-                    // borderColor: 'primary.light',
-                    '& .MuiDataGrid-cell:hover': {
+                  boxShadow: 2,
+                  borderRadius: 1,
+                  '& .MuiDataGrid-columnHeaders': {
+                      borderBottom: '2px solid #e0e0e0',
+                      fontSize: 14,
+                      fontWeight: 700,
+                  },
+                  '& .MuiDataGrid-cell': {
+                      borderBottom: '1px solid #e0e0e0',
+                      fontSize: 13,
+                      paddingLeft: 2,
+                  },
+                  '& .MuiDataGrid-cell:hover': {
                       color: 'primary.secondary',
-                    },
-                  }}
+                  },
+              }}
             />
             </Box>
         </>

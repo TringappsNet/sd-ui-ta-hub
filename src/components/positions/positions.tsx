@@ -123,50 +123,28 @@ export default function Positions(){
 
   console.log("rows",rows);
   const columns: GridColDef[] = [
-    { field: 'candidateName', headerName: 'Candidate Name', width: 180, editable: true },
-    { field: 'candidateEmail', headerName: 'Email', width: 200, editable: true },
-    { field: 'candidateContact', headerName: 'Contact', width: 120, editable: true },
-    { field: 'technology', headerName: 'Technology', width: 150, editable: true },
-    { field: 'totalExperience', headerName: 'Experience', width: 120, editable: true },
-    { field: 'clientName', headerName: 'Client Name', width: 150, editable: true },
-    { field: 'currentCtc', headerName: 'Current CTC', width: 120, editable: true },
-    { field: 'expectedCtc', headerName: 'Expected CTC', width: 120, editable: true },
-    { field: 'noticePeriod', headerName: 'Notice Period', width: 120, editable: true },
-    { field: 'modeOfWork', headerName: 'Mode of Work', width: 150, editable: true },
-    { field: 'currentLocation', headerName: 'Location', width: 150, editable: true },
-    { field: 'candidateStatus', headerName: 'Status', width: 120, editable: true },
-    { field: 'taskCandidateStatus', headerName: 'Task Status', width: 120, editable: true },
-    { field: 'recruiter', headerName: 'Recruiter', width: 120, editable: true },
-    { field: 'recruitedSource', headerName: 'Recruited Source', width: 150, editable: true },
-    { field: 'comments', headerName: 'Comments', width: 120, editable: true },
-    // {
-    //   field: 'age',
-    //   headerName: 'Age',
-    //   type: 'number',
-    //   width: 80,
-    //   align: 'left',
-    //   headerAlign: 'left',
-    //   editable: true,
-    // },
-    // {
-    //   field: 'joinDate',
-    //   headerName: 'Join date',
-    //   type: 'date',
-    //   width: 180,
-    //   editable: true,
-    // },
-    // {
-    //   field: 'role',
-    //   headerName: 'Department',
-    //   width: 220,
-    //   editable: true,
-    //   type: 'singleSelect',
-    //   valueOptions: ['Market', 'Finance', 'Development'],
-    // },
+    { field: 'candidateName', headerName: 'Candidate Name', width: 180, editable: true, headerClassName: 'column-header' },
+    { field: 'candidateEmail', headerName: 'Email', width: 200, editable: true, headerClassName: 'column-header' },
+    { field: 'candidateContact', headerName: 'Contact', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'technology', headerName: 'Technology', width: 150, editable: true, headerClassName: 'column-header' },
+    { field: 'totalExperience', headerName: 'Experience', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'clientName', headerName: 'Client Name', width: 150, editable: true, headerClassName: 'column-header' },
+    { field: 'currentCtc', headerName: 'Current CTC', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'expectedCtc', headerName: 'Expected CTC', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'noticePeriod', headerName: 'Notice Period', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'modeOfWork', headerName: 'Mode of Work', width: 150, editable: true, headerClassName: 'column-header' },
+    { field: 'currentLocation', headerName: 'Location', width: 150, editable: true, headerClassName: 'column-header' },
+    { field: 'candidateStatus', headerName: 'Status', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'taskCandidateStatus', headerName: 'Task Status', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'recruiter', headerName: 'Recruiter', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'recruitedSource', headerName: 'Recruited Source', width: 150, editable: true, headerClassName: 'column-header' },
+    { field: 'comments', headerName: 'Comments', width: 120, editable: true, headerClassName: 'column-header' },
+    
     {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
+      headerClassName: 'column-header',
       width: 100,
       cellClassName: 'actions',
       getActions: ({ id }) => {
@@ -234,12 +212,23 @@ export default function Positions(){
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={handleProcessRowUpdateError}
-                // slots={{
-                // toolbar: EditToolbar as GridSlots['toolbar'],
-                // }}
-                // slotProps={{
-                // toolbar: { setRows, setRowModesModel },
-                // }}
+                sx={{
+                  boxShadow: 2,
+                  borderRadius: 1,
+                  '& .MuiDataGrid-columnHeaders': {
+                      borderBottom: '2px solid #e0e0e0',
+                      fontSize: 14,
+                      fontWeight: 700,
+                  },
+                  '& .MuiDataGrid-cell': {
+                      borderBottom: '1px solid #e0e0e0',
+                      fontSize: 13,
+                      paddingLeft: 2,
+                  },
+                  '& .MuiDataGrid-cell:hover': {
+                      color: 'primary.secondary',
+                  },
+              }}
             />
             </Box>
         </>
