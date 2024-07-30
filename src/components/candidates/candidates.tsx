@@ -221,20 +221,20 @@ const handleCancelDelete = () => {
 
   console.log("rows",rows);
   const columns: GridColDef[] = [
-    { field: 'candidateName', headerName: 'Candidate Name', width: 180, editable: true },
-    { field: 'candidateEmail', headerName: 'Email', width: 200, editable: true },
-    { field: 'candidateContact', headerName: 'Contact', width: 120, editable: true },
-    { field: 'technology', headerName: 'Technology', width: 150, editable: true },
-    { field: 'totalExperience', headerName: 'Experience', width: 120, editable: true },
-    { field: 'currentCtc', headerName: 'Current CTC', width: 120, editable: true },
-    { field: 'expectedCtc', headerName: 'Expected CTC', width: 120, editable: true },
-    { field: 'noticePeriod', headerName: 'Notice Period', width: 120, editable: true },
-    { field: 'modeOfWork', headerName: 'Mode of Work', width: 150, editable: true },
-    { field: 'currentLocation', headerName: 'Location', width: 150, editable: true },
-    { field: 'candidateStatus', headerName: 'Status', width: 120, editable: true },
-    { field: 'recruiter', headerName: 'Recruiter', width: 120, editable: true },
-    { field: 'recruitedSource', headerName: 'Recruited Source', width: 150, editable: true },
-    { field: 'comments', headerName: 'Comments', width: 120, editable: true },
+    { field: 'candidateName', headerName: 'Candidate Name', width: 180, editable: true, headerClassName: 'column-header' },
+    { field: 'candidateEmail', headerName: 'Email', width: 200, editable: true, headerClassName: 'column-header' },
+    { field: 'candidateContact', headerName: 'Contact', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'technology', headerName: 'Technology', width: 150, editable: true, headerClassName: 'column-header' },
+    { field: 'totalExperience', headerName: 'Experience', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'currentCtc', headerName: 'Current CTC', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'expectedCtc', headerName: 'Expected CTC', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'noticePeriod', headerName: 'Notice Period', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'modeOfWork', headerName: 'Mode of Work', width: 150, editable: true, headerClassName: 'column-header' },
+    { field: 'currentLocation', headerName: 'Location', width: 150, editable: true, headerClassName: 'column-header' },
+    { field: 'candidateStatus', headerName: 'Status', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'recruiter', headerName: 'Recruiter', width: 120, editable: true, headerClassName: 'column-header' },
+    { field: 'recruitedSource', headerName: 'Recruited Source', width: 150, editable: true, headerClassName: 'column-header' },
+    { field: 'comments', headerName: 'Comments', width: 120, editable: true, headerClassName: 'column-header' },
     // {
     //   field: 'age',
     //   headerName: 'Age',
@@ -263,6 +263,7 @@ const handleCancelDelete = () => {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
+      headerClassName: 'column-header',
       width: 100,
       cellClassName: 'actions',
       getActions: ({ id }) => {
@@ -348,22 +349,23 @@ const handleCancelDelete = () => {
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={handleProcessRowUpdateError}
+                
                 sx={{
                     boxShadow: 2,
-                    // borderRadius: 1,
-                    padding: 1,
+                    borderRadius: 1,
                     '& .MuiDataGrid-columnHeaders': {
                         borderBottom: '2px solid #e0e0e0',
-                        fontSize: 12,
-                        fontWeight: 700,
+                        fontSize: 13,
+                        fontWeight: 800,
                     },
                     '& .MuiDataGrid-cell': {
                         borderBottom: '1px solid #e0e0e0',
-                        fontSize: 14,
+                        fontSize: 13,
                     },
                     '& .MuiDataGrid-cell:hover': {
                         color: 'primary.secondary',
                     },
+
                 }}
             />
             <Dialog open={open} onClose={handleClose}>
@@ -377,7 +379,7 @@ const handleCancelDelete = () => {
                             label={col.headerName}
                             type="text"
                             fullWidth
-                            variant="outlined"
+                            variant="outlined"                           
                             value={newCandidate[col.field] || ''}
                             onChange={handleInputChange}
                         />

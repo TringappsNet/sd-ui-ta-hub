@@ -401,6 +401,7 @@ const handleAddPosition = () => {
                                       className="calendarbox"
                                       style={{ borderColor: (formSubmitted && startDate === null) ? 'red' : '' }}
                                       name="date"
+                                      placeholder='dd/mm/yyyy'
                                       value={startDate ? startDate.toISOString().split('T')[0] : ''}
                                       onChange={(e) => setStartDate(new Date(Date.parse(e.target.value)))}
                                   />                                 
@@ -524,9 +525,9 @@ const handleAddPosition = () => {
                                                 value={modeOfInterviews} 
                                                 onChange={(e) => setModeOfInterviews(e.target.value)}                                                                                            >
                                                 <option value="">Select an option</option>
-                                                <option value="option1">In-Person </option>
-                                                <option value="option2">Online </option>
-                                                <option value="option3">Group </option>
+                                                <option value="option1" className="option">In-Person </option>
+                                                <option value="option2" className="option">Online </option>
+                                                <option value="option3" className="option">Group </option>
                                             </select>
                                         </div>
                                     </div>
