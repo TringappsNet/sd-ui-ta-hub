@@ -401,6 +401,7 @@ const handleAddPosition = () => {
                                       className="calendarbox"
                                       style={{ borderColor: (formSubmitted && startDate === null) ? 'red' : '' }}
                                       name="date"
+                                      placeholder='dd/mm/yyyy'
                                       value={startDate ? startDate.toISOString().split('T')[0] : ''}
                                       onChange={(e) => setStartDate(new Date(Date.parse(e.target.value)))}
                                   />                                 

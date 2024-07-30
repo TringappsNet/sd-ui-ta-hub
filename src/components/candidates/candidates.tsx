@@ -336,6 +336,7 @@ const handleCancelDelete = () => {
                 onRowEditStop={handleRowEditStop}
                 processRowUpdate={processRowUpdate}
                 onProcessRowUpdateError={handleProcessRowUpdateError}
+                
                 sx={{
                     boxShadow: 2,
                     borderRadius: 1,
@@ -352,6 +353,7 @@ const handleCancelDelete = () => {
                     '& .MuiDataGrid-cell:hover': {
                         color: 'primary.secondary',
                     },
+
                 }}
             />
             <Dialog open={open} onClose={handleClose}>
