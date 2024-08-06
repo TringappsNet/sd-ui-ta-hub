@@ -3,8 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent, CardHeader, IconButton, Typography, Chip } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Task } from '../../lib/store';
-
+import { Task } from '../../constants/types';
 // Assuming Task interface is defined as before
 interface TaskCardProps {
   task: Task;
@@ -26,7 +25,7 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
     transition,
     isDragging
   } = useSortable({
-    id: task.id,
+    id: task.taskId,
     data: {
       type: 'Task',
       task
@@ -61,14 +60,14 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
             size="small"
             className="text-secondary"
           >
-            <DragIndicatorIcon />
+            <DragIndicatorIcon style={{ cursor: 'grab' }}/>
             <span className="visually-hidden">Move task</span>
           </IconButton>
         }
       />
       <CardContent>
         <Typography variant="body2" className="text-left">
-          {task.title}
+          {task.jobTitle}
         </Typography>
       </CardContent>
     </Card>

@@ -73,7 +73,7 @@ export function ColumnActions({ title, id }) {
         }}>
           Rename
         </MenuItem>
-        { id !="1" && <MenuItem onClick={() => {
+        { id !="8ff37b68-3279-475a-8470-77a643b1cfdc" && <MenuItem onClick={() => {
           setShowDeleteDialog(true);
           handleClose();
         }} style={{ color: 'red' }}>
