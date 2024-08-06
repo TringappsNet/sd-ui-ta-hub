@@ -25,6 +25,7 @@ export interface Task {
     createdAt: string; // Consider using Date if you're working with date objects
     lastUpdated: string; // Consider using Date if you're working with date objects
     clientName: string;
+    columnId: string;
 }
 
 export interface User {
