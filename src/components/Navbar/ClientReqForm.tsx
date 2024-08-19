@@ -12,6 +12,7 @@ import CustomSnackbar from "../CustomSnackbar";
 import { Tooltip } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Close as CloseIcon } from '@mui/icons-material';
 import { submitForm } from '../../GlobalRedux/Features/formSlice';
+import { useClientStore } from '../../lib/clientStore';
 
 interface Position {
   id: number;
@@ -29,13 +30,15 @@ interface FormProps {
   }
 
 const Form: React.FC<FormProps> = ({ onClose }) => {
+    const {clients} = useClientStore();
+    const [openAddForm, setOpenAddForm] = useState(false);
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [reqStartDate, setReqStartDate] = useState<Date | null>(null);
     const [projectStartDate, setProjectStartDate] = useState('');
     const [primarySkill, setPrimarySkill] = useState('');
     const [secondarySkill, setSecondarySkill] = useState('');
     const [isOpen, setIsOpen] = useState(true);
-    const [clients, setClients] = useState([]);
+    // const [clients, setClients] = useState([]);
     const [clientName, setClientName] = useState('');
     const [clientSpocName, setClientSpocName] = useState('');
     const [clientSpocContact, setClientSpocContact] = useState('');
@@ -65,33 +68,11 @@ const Form: React.FC<FormProps> = ({ onClose }) => {
     });
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', variant: 'success' });
     const [snackbarVariant, setSnackbarVariant] = useState('success');
     const [formSubmitted, setFormSubmitted] = useState(false);
 
-    const fetchClientData = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/api/clients/',{
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-        });
-
-        if (!response.ok) {
-          console.log(response)
-          // throw new Error('Failed to fetch data. Please try again.');
-        }
-        setClients(await response.json());
-      } catch (err) {
-        console.log('Error fetching data. Please try again.');
-      }
-      // } finally {
-      //   setIsLoading(false);
-      // }
-    };
-    useEffect(()=>{
-      fetchClientData();
-    },[clients])
+    
     useEffect(() => {
         const totalOpenings = positions.reduce((sum, position) => sum + parseInt(position.noOfOpenings, 10), 0);
         setNoOfOpenings(totalOpenings);
@@ -113,6 +94,7 @@ const Form: React.FC<FormProps> = ({ onClose }) => {
           approvedBy.trim() === '' ||
           positions.length === 0 
         ) {
+          
           setSnackbarOpen(true);
           setSnackbarMessage("Please fill all fields!");
           setSnackbarVariant("error");
@@ -415,11 +397,30 @@ const handleAddPosition = () => {
                                         style={{ borderColor: (formSubmitted && clientName.trim() === '') ? 'red' : '' }}
                                         name="cname" 
                                         value={clientName} 
-                                        onChange={(e) => setClientName(e.target.value)}>
-                                        <option className='text' value="">Select a client</option>
-                                        {clients && clients.map((client,index)=>{
-                                          return <option key={index} value={client}>{client}</option>
-                                        })}
+                                        onChange={(e) => {
+                                          const clientId = Number(e.target.value);
+                                          const selectedClient = clients.find(client => client.clientId === clientId);
+  
+                                          if (selectedClient) {
+                                            setClientName(selectedClient.clientName);
+                                            setClientSpocName(selectedClient.clientSpocName);
+                                            setClientSpocContact(selectedClient.clientSpocContact)
+                                            // Add any other fields you want to update here
+                                          } else {
+                                            // Reset fields if no client is selected
+                                            setClientName('');
+                                            setClientSpocName('');
+                                            setClientSpocContact('');
+                                            // Reset other fields as needed
+                                          }
+                                          setClientName(e.target.value)
+                                          
+                                        }}>
+                                        <option className='text' value="0">Select a client</option>
+                                        {clients && clients.map((client, index) => (
+                                          
+                                          <option key={client.clientId} value={client.clientId}>{client.clientName}</option>
+                                        ))}
                                         {/* <option value="">Select an option</option>
                                         <option value="option1">In-Person </option>
                                         <option value="option2">Online </option>
@@ -444,6 +445,7 @@ const handleAddPosition = () => {
                                         style={{ borderColor: (formSubmitted && clientSpocName.trim() === '') ? 'red' : '' }} 
                                         name="spocname" 
                                         value={clientSpocName} 
+                                        readOnly
                                         onChange={(e) => setClientSpocName(e.target.value)} 
                                     />
                                 </div>

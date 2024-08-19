@@ -30,6 +30,7 @@ import {
   import { useClientStore, Client } from "../../lib/clientStore";
 import TextField from "@mui/material/TextField";
 import { Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material';
+import ClientAddForm from "./clientAddForm";
 
 export default function Clients(){
     const { clients, isLoading, isInitialized, getClients, updateClient, deleteClient, addClient } = useClientStore();
@@ -88,27 +89,7 @@ export default function Clients(){
         clientLocation: '',
     });
 };
-  const handleChange = (event) => {
-  const { name, value } = event.target;
-  setNewClient((prev) => ({ ...prev, [name]: value }));
-};
-
-const handleSubmit = async () => {
-  if (!areAllFieldsFilled()) {
-    showSnackbar('Please fill all the fields', 'error');
-    return;
-}  
-  try {
-      const addedClient = await addClient(newClient);
-      getClients();
-      setRows((prevRows) => [...prevRows, addedClient]);
-      handleCloseAddForm();
-      showSnackbar('Client added successfully', 'success');
-  } catch (error) {
-      console.error("Error adding client:", error);
-      showSnackbar('Error adding client', 'error');
-  }
-};
+  
 const areAllFieldsFilled = () => {
   return Object.values(newClient).every(value => value !== '');
 };
@@ -128,7 +109,7 @@ const areAllFieldsFilled = () => {
   const handleSaveClick = (id: GridRowId) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
-  const handleDeleteClick = (id: GridRowId) => () => {
+  const handleDeleteClick = (id: GridRowId ) => () => {
     setDeleteConfirmation({ open: true, id });
   };
 
@@ -261,7 +242,7 @@ const areAllFieldsFilled = () => {
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete"
-            onClick={handleDeleteClick(id)}
+            onClick={handleDeleteClick(id as GridRowId)}
             sx={{
                 color: 'error.dark',
               }}
@@ -325,7 +306,7 @@ const areAllFieldsFilled = () => {
                   },
               }}
             />
-            <Dialog open={openAddForm} onClose={handleCloseAddForm}>
+            {/* <Dialog open={openAddForm} onClose={handleCloseAddForm}>
                 <DialogTitle>Add New Client</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -377,7 +358,8 @@ const areAllFieldsFilled = () => {
                     <Button onClick={handleCloseAddForm}>Cancel</Button>
                     <Button onClick={handleSubmit}>Add</Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
+            <ClientAddForm openAddForm={openAddForm} setOpenAddForm={setOpenAddForm}/>
             <Dialog
               open={deleteConfirmation.open}
               onClose={handleCancelDelete}
