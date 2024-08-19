@@ -50,7 +50,8 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
 
   const style = {
     transition,
-    transform: CSS.Translate.toString(transform)
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.6 : 1,
   };
 
   const cardClassName = `h-75vh  bg-light flex-column flex-shrink-0 snap-center me-3 overflow-y-auto ${
@@ -79,8 +80,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
       }
     }}>
       <CardHeader 
-        className="d-flex flex-row align-items-center border-bottom p-3 text-bg-light fixed"
-        
+        className="d-flex flex-row align-items-center border-bottom p-3 text-bg-light"
         title={
           <Box className="d-flex align-items-center ">
             {/* <Button
@@ -92,7 +92,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
             <GripVertical 
               {...attributes}
               {...listeners}
-              className="me-2 p-1 text-muted border-0"
+              className="me-2 p-1 text-muted border-0 "
               style={{ cursor: 'grab' }}
               size={32}
               aria-hidden="true"
