@@ -32,8 +32,8 @@ export default function Navbar(){
     return (
         <nav className="navbar navbar-expand-lg">
             <div className="container-fluid px-3 py-1 border-bottom flex flex-row align-items-center">
-                <button className="navbar-toggler collapsed" type="button" data-toggle="collapse" 
-                data-target="#navbarExample" aria-controls="navbarExample" aria-expanded="false" aria-label="Toggle navigation">
+                <button className="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarExample" aria-controls="navbarExample" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
                 </button>
                 <a className="navbar-brand pt-0" href="/dashboard"><FastForward color="#357DE8"/><span className=" text font-weight-bold text-dark">tringapps</span></a>

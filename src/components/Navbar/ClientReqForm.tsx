@@ -35,6 +35,7 @@ const Form: React.FC<FormProps> = ({ onClose }) => {
     const [primarySkill, setPrimarySkill] = useState('');
     const [secondarySkill, setSecondarySkill] = useState('');
     const [isOpen, setIsOpen] = useState(true);
+    const [clients, setClients] = useState([]);
     const [clientName, setClientName] = useState('');
     const [clientSpocName, setClientSpocName] = useState('');
     const [clientSpocContact, setClientSpocContact] = useState('');
@@ -67,6 +68,30 @@ const Form: React.FC<FormProps> = ({ onClose }) => {
     const [snackbarVariant, setSnackbarVariant] = useState('success');
     const [formSubmitted, setFormSubmitted] = useState(false);
 
+    const fetchClientData = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/clients/',{
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+        });
+
+        if (!response.ok) {
+          console.log(response)
+          // throw new Error('Failed to fetch data. Please try again.');
+        }
+        setClients(await response.json());
+      } catch (err) {
+        console.log('Error fetching data. Please try again.');
+      }
+      // } finally {
+      //   setIsLoading(false);
+      // }
+    };
+    useEffect(()=>{
+      fetchClientData();
+    },[clients])
     useEffect(() => {
         const totalOpenings = positions.reduce((sum, position) => sum + parseInt(position.noOfOpenings, 10), 0);
         setNoOfOpenings(totalOpenings);
@@ -371,8 +396,36 @@ const handleAddPosition = () => {
                         <div className="scrollable-area">
                             <div className='fields'>
                                 <div className="form-group pt-1 px-2">
-                                    <label htmlFor="cname" className="form-label ">Client Name</label>
-                                    <input 
+                                    <div className='d-flex flex-row align-center items-center'>
+                                      <div className='me-auto '>
+                                        <label htmlFor="cname" className="form-label ">Client Name</label>
+                                      </div>
+                                      <div className='mt-3 px-2 '>
+                                        {/* <a className='add-icon'>Add Client</a> */}
+                                        <Tooltip
+                                          title="Add Client"
+                                          arrow
+                                        >
+                                            <a href="#" className="text-decoration-underline text-primary" onClick={(e) => { e.preventDefault(); handleAddField(); }}> Add Client</a>
+                                        </Tooltip>
+                                      </div>
+                                    </div>
+                                    <select 
+                                        className="select-input-box" 
+                                        style={{ borderColor: (formSubmitted && clientName.trim() === '') ? 'red' : '' }}
+                                        name="cname" 
+                                        value={clientName} 
+                                        onChange={(e) => setClientName(e.target.value)}>
+                                        <option className='text' value="">Select a client</option>
+                                        {clients && clients.map((client,index)=>{
+                                          return <option key={index} value={client}>{client}</option>
+                                        })}
+                                        {/* <option value="">Select an option</option>
+                                        <option value="option1">In-Person </option>
+                                        <option value="option2">Online </option>
+                                        <option value="option3">Group </option> */}
+                                    </select>
+                                    {/* <input 
                                         type="text" 
                                         placeholder='Enter company Name'
                                         style={{ borderColor: (formSubmitted && clientName.trim() === '') ? 'red' : '' }} 
@@ -380,7 +433,7 @@ const handleAddPosition = () => {
                                         name="cname"  
                                         value={clientName} 
                                         onChange={(e) => setClientName(e.target.value)}  
-                                    />
+                                    /> */}
                                 </div>
                                 <div className="form-group pt-1 px-2">
                                     <label htmlFor="spocname" className="form-label">Client SPOC Name</label>
