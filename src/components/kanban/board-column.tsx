@@ -2,9 +2,9 @@ import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, Button, Box } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { useDndContext, type UniqueIdentifier } from '@dnd-kit/core';
-import { SortableContext, useSortable } from '@dnd-kit/sortable';
+import { rectSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Task } from '../../lib/store';
+import { Task } from '../../constants/types';
 import { ColumnActions } from './column-action';
 import {TaskCard} from './task-card';
 import { GripVertical } from 'lucide-react';
@@ -28,9 +28,8 @@ interface BoardColumnProps {
 
 export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
   const tasksIds = useMemo(() => {
-    return tasks.map((task) => task.id);
+    return tasks.map((task) => task.taskId);
   }, [tasks]);
-
   const {
     setNodeRef,
     attributes,
@@ -54,7 +53,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     transform: CSS.Translate.toString(transform)
   };
 
-  const cardClassName = `h-75vh  bg-light flex-column flex-shrink-0 snap-center me-3 ms-1 ${
+  const cardClassName = `h-75vh  bg-light flex-column flex-shrink-0 snap-center me-3 overflow-y-auto ${
     isOverlay ? 'border border-primary' : isDragging ? 'opacity-30' : ''
   }`;
 
@@ -62,10 +61,26 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     <Card ref={setNodeRef} style={style} className={cardClassName} sx={{
       height: '70vh',
       weight: '20vw !important' ,
-
+      '.scrollable-content': {
+        'scrollbar-width': 'none',
+      },
+      '&::-webkit-scrollbar': {
+        display: 'none',
+      },
+      scrollbarWidth: 'none',
+      '-ms-overflow-style': 'none',
+      '& *': {
+        '&::-webkit-scrollbar': {
+          width: 0,
+          height: 0,
+          background: 'transparent',
+        },
+        
+      }
     }}>
       <CardHeader 
-        className="d-flex flex-row align-items-center border-bottom p-3"
+        className="d-flex flex-row align-items-center border-bottom p-3 text-bg-light fixed"
+        
         title={
           <Box className="d-flex align-items-center ">
             {/* <Button
@@ -88,14 +103,15 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
           </Box>
         }
       />
-      <CardContent className="d-flex flex-column flex-grow-1 gap-3  p-2">
-        <Box className=" h-100">
-          <SortableContext items={tasksIds}>
+      <CardContent className="d-flex flex-column flex-grow-1 gap-3  p-2" style={{overflow: 'auto',}}>
+        <Box className=" h-100" style={{overflow: 'auto !important',}}>
+          <SortableContext items={tasksIds} >
             {tasks.map((task) => (
-              <TaskCard key={task.id}  task={task} />
+              <TaskCard key={task.taskId}  task={task} />
             ))}
           </SortableContext>
         </Box>
+
       </CardContent>
     </Card>
   );

@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 import { Column } from '../components/kanban/board-column';
 import { UniqueIdentifier } from '@dnd-kit/core';
 import axios from 'axios';
+import { Task } from '../constants/types';
 import { backend_url } from '../constants/app_constants';
 
 // Use string type for dynamic column IDs
@@ -20,12 +21,12 @@ const defaultCols = [
 ] satisfies Column[];
 
 
-export type Task = {
-  id: string;
-  title: string;
-  description?: string;
-  status: ColumnId;
-};
+// export type Task = {
+//   id: string;
+//   title: string;
+//   description?: string;
+//   status: Status;
+// };
 
 export type State = {
   tasks: Task[];
@@ -37,19 +38,57 @@ export type State = {
 
 const initialTasks: Task[] = [
   {
-    id: 'task1',
-    status: '1',
-    title: 'Project initiation and planning'
+    taskId: 'task1',
+    columnId: '1',
+    jobTitle: 'Project initiation and planning',
+    jobId: 0,
+    roleType: '',
+    modeOfWork: '',
+    workLocation: '',
+    yearsOfExperienceRequired: 0,
+    primarySkillSet: '',
+    secondarySkillSet: '',
+    clientBudget: '',
+    assignedBudget: '',
+    primaryAssignee: '',
+    taskStatus: '',
+    secondaryAssignee: '',
+    approvalStatus: false,
+    backlogs: false,
+    description: '',
+    createdAt: '',
+    lastUpdated: '',
+    clientName: ''
   },
   {
-    id: 'task2',
-    status: '1',
-    title: 'Gather requirements from stakeholders'
+    taskId: 'task2',
+    columnId: '1',
+    jobTitle: 'Project initiation and planning',
+    jobId: 0,
+    roleType: '',
+    modeOfWork: '',
+    workLocation: '',
+    yearsOfExperienceRequired: 0,
+    primarySkillSet: '',
+    secondarySkillSet: '',
+    clientBudget: '',
+    assignedBudget: '',
+    primaryAssignee: '',
+    taskStatus: '',
+    secondaryAssignee: '',
+    approvalStatus: false,
+    backlogs: false,
+    description: '',
+    createdAt: '',
+    lastUpdated: '',
+    clientName: ''
   }
 ];
 
 export type Actions = {
+  initialize: () => void;
   getCol: () => void;
+  getTask: () => void;
   addTask: (title: string, description?: string) => void;
   addCol: (title: string) => void;
   dragTask: (id: string | null) => void;
@@ -58,16 +97,24 @@ export type Actions = {
   setTasks: (updatedTask: Task[]) => void;
   setCols: (cols: Column[]) => void;
   updateCol: (id: string, newName: string) => void;
+  updateTask: (id: string, updatedTask:Task) => void;
 };
 
 export const useTaskStore = create<State & Actions>()(
   persist(
     (set,get) => ({
-      tasks: initialTasks,
+      tasks: [],
       columns: [],
       draggedTask: null,
       isLoading: false,
       isInitialized : false,
+      initialize: async () => {
+        set({ isLoading: true, isInitialized: false });
+        const state = get();
+        await state.getTask();
+        await state.getCol();
+        set({ isLoading: false, isInitialized: true });
+      },
       getCol: async ()=> {
         try {
           const response = await axios.get(`${backend_url}/api/board/columns`,{
@@ -82,18 +129,63 @@ export const useTaskStore = create<State & Actions>()(
           set({
               columns: data,
               isLoading: false,
-              isInitialized: true
+              // isInitialized: true
           });
         } catch (error) {
             console.error('Error fetching data from server:', error);
-            set({ isLoading: false, isInitialized: true });
+            set({ isLoading: false, });
+        }
+      },
+      getTask: async ()=> {
+        try {
+          const response = await axios.get(`${backend_url}/api/tasks/`,{
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Access-Control-Allow-Origin': '*',
+              },
+              withCredentials: true,
+          });
+          const data = response.data;
+          if(response.status == 200){
+            set({
+              tasks: data,
+              isLoading: false,
+              // isInitialized: true
+            });
+          }
+          
+        } catch (error) {
+            console.error('Error fetching data from server:', error);
+            set({ isLoading: false });
         }
       },
       addTask: (title: string, description?: string) =>
         set((state) => ({
           tasks: [
             ...state.tasks,
-            { id: uuid(), title, description, status: 'TODO' }
+            { 
+              taskId: 'task2',
+              columnId: '1',
+              jobTitle: 'Project initiation and planning',
+              jobId: 0,
+              roleType: '',
+              modeOfWork: '',
+              workLocation: '',
+              yearsOfExperienceRequired: 0,
+              primarySkillSet: '',
+              secondarySkillSet: '',
+              clientBudget: '',
+              assignedBudget: '',
+              primaryAssignee: '',
+              taskStatus: '',
+              secondaryAssignee: '',
+              approvalStatus: false,
+              backlogs: false,
+              description: '',
+              createdAt: '',
+              lastUpdated: '',
+              clientName: ''
+            }
           ]
         })),
       updateCol: async (id: string, newName: string) =>{
@@ -122,6 +214,32 @@ export const useTaskStore = create<State & Actions>()(
             set({ isLoading: false, isInitialized: true });
         }
         },
+        updateTask: async (id: string, updatedTask: Task) =>{
+          try {
+            const response = await axios.put(`${backend_url}/api/tasks/task/${id}`,updatedTask,{
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                },
+                withCredentials: true,
+            });
+            const data = response.data;
+            
+            if(response.status == 200){
+              set(state => ({
+                tasks: state.tasks.map((task) =>
+                  task.taskId === id ? { ...updatedTask } : task
+                ),
+                isLoading: false,
+                isInitialized: true,
+              }));
+            }
+            
+          } catch (error) {
+              console.error('Error fetching data from server:', error);
+              set({ isLoading: false, isInitialized: true });
+          }
+          },
       addCol: async (column: string) =>{
         try {
           const response = await axios.post(`${backend_url}/api/board/column`,{"column":column},{
@@ -132,8 +250,6 @@ export const useTaskStore = create<State & Actions>()(
               withCredentials: true,
           });
           const data = response.data;
-          console.log(response.status);
-          console.log(data);
           if(response.status == 201){
             await get().getCol();
             set({
@@ -150,7 +266,7 @@ export const useTaskStore = create<State & Actions>()(
       dragTask: (id: string | null) => set({ draggedTask: id }),
       removeTask: (id: string) =>
         set((state) => ({
-          tasks: state.tasks.filter((task) => task.id !== id)
+          tasks: state.tasks.filter((task) => task.taskId !== id)
         })),
       removeCol: async (id: string) => {
         try {
@@ -163,7 +279,7 @@ export const useTaskStore = create<State & Actions>()(
           });
           const data = response.data;
           
-          if(response.status == 200){
+          if(response.status == 204){
             set(state => ({
               
               columns: state.columns.filter((col) => col.id != id),
@@ -171,7 +287,6 @@ export const useTaskStore = create<State & Actions>()(
               isInitialized: true,
             }));
           }
-          
         } catch (error) {
             console.error('Error fetching data from server:', error);
             set({ isLoading: false, isInitialized: true });
