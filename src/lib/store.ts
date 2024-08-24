@@ -148,12 +148,12 @@ export const useTaskStore = create<State & Actions>()(
           const data = response.data;
           if(response.status == 200){
             set({
-              tasks: data,
+              tasks: data.filter((task)=> task.approvalStatus != false),
               isLoading: false,
               // isInitialized: true
             });
           }
-          
+          console.log(get().tasks);
         } catch (error) {
             console.error('Error fetching data from server:', error);
             set({ isLoading: false });

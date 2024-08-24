@@ -61,8 +61,6 @@ export function KanbanBoard() {
 
   // ... (keep the existing helper functions like getDraggingTaskData, announcements, etc.)
   function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
-    console.log(taskId)
-    console.log(columnId)
     const tasksInColumn = tasks.filter((task) => task.columnId === columnId);
     const taskPosition = tasksInColumn.findIndex((task) => task.taskId === taskId);
     const column = columns.find((col) => col.id === columnId);
@@ -125,8 +123,6 @@ export function KanbanBoard() {
       }
     },
     onDragEnd({ active, over }) {
-      console.log("active", active)
-      console.log("over", over)
       if (!hasDraggableData(active) || !hasDraggableData(over)) {
         pickedUpTaskColumn.current = null;
         return;
@@ -137,7 +133,6 @@ export function KanbanBoard() {
         over.data.current?.type === 'Column'
       ) {
         const overColumnPosition = columnsId.findIndex((id) => id === over.id);
-        console.log("overColumnPosition",overColumnPosition)
         return `Column ${
           active.data.current.column.column
         } was dropped into position ${overColumnPosition + 1} of ${
@@ -152,7 +147,6 @@ export function KanbanBoard() {
           over.data.current.task.columnId
         );
         if (over.data.current.task.columnId !== pickedUpTaskColumn.current) {
-          console.log("columnId",over.data.current.task.columnId)
           updateTask(over.data.current.task.taskId, over.data.current.task);
           return `Task was dropped into column ${column?.column} in position ${
             taskPosition + 1

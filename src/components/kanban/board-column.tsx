@@ -65,11 +65,12 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
       '.scrollable-content': {
         'scrollbar-width': 'none',
       },
+      
       '&::-webkit-scrollbar': {
         display: 'none',
       },
-      scrollbarWidth: 'none',
-      '-ms-overflow-style': 'none',
+      'scrollbarWidth': 'none',
+      'msOverflowStyle': 'none',
       '& *': {
         '&::-webkit-scrollbar': {
           width: 0,

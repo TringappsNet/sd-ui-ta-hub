@@ -7,6 +7,7 @@ import ForgetPassword from "./components/forgetPassword";
 import ResetPassword from "./components/resetNewPassword";
 import ResetNew from "./components/resetPassword";
 import Board from "./components/Dnd";
+import './App.css';
 // import Dashboard from "./components/Dashboard";
 import Sidebar from "./components/Sidebar";
 import ApprovalRequest from "./components/ApprovalRequest";

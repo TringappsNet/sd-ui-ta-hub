@@ -39,18 +39,19 @@ export default function MenuPopupState() {
     };
 
     return (
+        <>
         <PopupState variant="popover" popupId="demo-popup-menu">
             {(popupState) => (
-                <React.Fragment>
+                <div>
                     <Button 
                         style={{color:"grey",backgroundColor:"rgb(207, 207, 206)",boxShadow:"none",background:"none",textTransform:"lowercase"}}
                         variant="contained" 
                         {...bindTrigger(popupState)}
                     >
                          {email}
-                        <IconButton {...bindTrigger(popupState)}  className='arrow' size="small">
-                            <ArrowDropDownIcon />
-                        </IconButton>
+                        {/* <IconButton {...bindTrigger(popupState)}  className='arrow' size="small"> */}
+                            <ArrowDropDownIcon {...bindTrigger(popupState)} className='' />
+                        {/* </IconButton> */}
                     </Button>
                     
                     <Menu {...bindMenu(popupState)} className='dropDown'>
@@ -67,8 +68,9 @@ export default function MenuPopupState() {
                         message="Are you sure you want to logout ?"
                     />
                     <InvitePopup show={showInvitePopup} handleClose={closeInvitePopup} />
-                </React.Fragment>
+                </div>
             )}
         </PopupState>
+        </>
     );
 }

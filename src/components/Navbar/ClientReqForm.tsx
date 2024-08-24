@@ -13,6 +13,8 @@ import { Tooltip } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Close as CloseIcon } from '@mui/icons-material';
 import { submitForm } from '../../GlobalRedux/Features/formSlice';
 import { useClientStore } from '../../lib/clientStore';
+import ClientAddForm from '../clients/clientAddForm';
+import { backend_url } from '../../constants/app_constants';
 
 interface Position {
   id: number;
@@ -30,7 +32,7 @@ interface FormProps {
   }
 
 const Form: React.FC<FormProps> = ({ onClose }) => {
-    const {clients} = useClientStore();
+    const {clients, getClients} = useClientStore();
     const [openAddForm, setOpenAddForm] = useState(false);
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [reqStartDate, setReqStartDate] = useState<Date | null>(null);
@@ -71,7 +73,9 @@ const Form: React.FC<FormProps> = ({ onClose }) => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', variant: 'success' });
     const [snackbarVariant, setSnackbarVariant] = useState('success');
     const [formSubmitted, setFormSubmitted] = useState(false);
-
+    useEffect(()=>{
+      getClients();
+    },[])
     
     useEffect(() => {
         const totalOpenings = positions.reduce((sum, position) => sum + parseInt(position.noOfOpenings, 10), 0);
@@ -101,7 +105,7 @@ const Form: React.FC<FormProps> = ({ onClose }) => {
           return;
         }  
         const formData = [{
-            requirementStartDate: reqStartDate?.toISOString(),
+            requirementStartDate: startDate?.toISOString(),
             clientName,
             clientSpocName,
             clientSpocContact,
@@ -127,7 +131,7 @@ const Form: React.FC<FormProps> = ({ onClose }) => {
         console.log("Form Data:", formData);
     
         try {
-            const response = await fetch('http://localhost:8080/api/requirement', {
+            const response = await fetch(`${backend_url}/api/requirement`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -170,13 +174,13 @@ const Form: React.FC<FormProps> = ({ onClose }) => {
                         noOfOpenings: parseInt(position.noOfOpenings, 10)
                     }))
                 };
-    
-                const emailResponse = await fetch('http://localhost:8080/api/job-approval', {
+                console.log(formData[0])
+                const emailResponse = await fetch(`${backend_url}/api/job-approval`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(approvalPayload)
+                    body: JSON.stringify(formData[0])
                 });
     
                 if (emailResponse.ok) {
@@ -388,7 +392,7 @@ const handleAddPosition = () => {
                                           title="Add Client"
                                           arrow
                                         >
-                                            <a href="#" className="text-decoration-underline text-primary" onClick={(e) => { e.preventDefault(); handleAddField(); }}> Add Client</a>
+                                            <a href="#" className="text-decoration-underline text-primary" onClick={(e) => { e.preventDefault(); setOpenAddForm(true); }}> Add Client</a>
                                         </Tooltip>
                                       </div>
                                     </div>
@@ -413,7 +417,6 @@ const handleAddPosition = () => {
                                             setClientSpocContact('');
                                             // Reset other fields as needed
                                           }
-                                          setClientName(e.target.value)
                                           
                                         }}>
                                         <option className='text' value="0">Select a client</option>
@@ -470,6 +473,7 @@ const handleAddPosition = () => {
                                         placeholder='eg: 1234567890'
                                         name="contact" 
                                         value={clientSpocContact} 
+                                        readOnly
                                         onChange={(e) => setClientSpocContact(e.target.value)} 
                                     />
                                 </div>
@@ -623,6 +627,7 @@ const handleAddPosition = () => {
                         </div>
                     </form>
                 </div>
+                <ClientAddForm openAddForm={openAddForm} setOpenAddForm={setOpenAddForm}/>
                 <CustomSnackbar
                     message={snackbarMessage}
                     variant={snackbarVariant}

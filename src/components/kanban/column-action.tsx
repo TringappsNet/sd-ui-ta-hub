@@ -1,9 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button, TextField, Menu, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Ellipsis} from 'lucide-react';
+import {  EllipsisVertical} from 'lucide-react';
 import { Toast, ToastContainer } from 'react-bootstrap';
 import { useTaskStore } from '../../lib/store';
+import { primary_board } from '../../constants/app_constants';
 
 export function ColumnActions({ title, id }) {
   const [name, setName] = useState(title);
@@ -23,7 +24,17 @@ export function ColumnActions({ title, id }) {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  useEffect(() => {
+    const handleBlur = () => {
+      setIsEditDisable(true);
+    };
+  
+    document.addEventListener('blur', handleBlur);
+  
+    return () => {
+      document.removeEventListener('blur', handleBlur);
+    };
+  }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsEditDisable(!editDisable);
@@ -48,8 +59,22 @@ export function ColumnActions({ title, id }) {
           disabled={editDisable}
           inputRef={inputRef}
           // defaultValue="Small"
+          className='ralewayFont'
           variant="standard"
           size="small"
+          sx={{ 
+            '& .MuiInputBase-input':{
+              color: 'black',
+            },
+            
+            '& .Mui-disabled':{
+              color: 'black !important',
+              '-webkit-text-fill-color': 'black',
+            },
+            '& .MuiInput-input':{
+              color: 'black !important',
+            }
+           }}
         />
         {/* <Button
           variant="contained"
@@ -57,7 +82,7 @@ export function ColumnActions({ title, id }) {
           size="small"
           onClick={handleClick}
         > */}
-          <Ellipsis onClick={handleClick} className=''  style={{cursor: 'pointer'}}/>
+          <EllipsisVertical onClick={handleClick} className=''  style={{cursor: 'pointer'}}/>
         {/* </Button> */}
       </form>
 
@@ -73,7 +98,7 @@ export function ColumnActions({ title, id }) {
         }}>
           Rename
         </MenuItem>
-        { id !="8ff37b68-3279-475a-8470-77a643b1cfdc" && <MenuItem onClick={() => {
+        { id != primary_board && <MenuItem onClick={() => {
           setShowDeleteDialog(true);
           handleClose();
         }} style={{ color: 'red' }}>

@@ -40,7 +40,7 @@ export default function Clients(){
     //   open: boolean;
     //   id: GridRowId | null;
     // };
-    const [deleteConfirmation, setDeleteConfirmation] = useState({ open: false, id: null });
+    const [deleteConfirmation, setDeleteConfirmation] = useState<{open:boolean, id: number | null }>({ open: false, id: 0 });
     const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
     const [openAddForm, setOpenAddForm] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', variant: 'success' });
@@ -110,7 +110,7 @@ const areAllFieldsFilled = () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
   const handleDeleteClick = (id: GridRowId ) => () => {
-    setDeleteConfirmation({ open: true, id });
+    setDeleteConfirmation({ open: true, id: Number(id) });
   };
 
   const handleConfirmDelete = () => {
@@ -147,7 +147,6 @@ const areAllFieldsFilled = () => {
 
   const processRowUpdate = async (newRow: GridRowModel) => {
     try{
-        console.log("newRow", newRow);
         // Find the original row
         const originalRow = rows.find((row) => row.clientId === newRow.clientId);
         const updatedRow = newRow as Client;
@@ -191,7 +190,6 @@ const areAllFieldsFilled = () => {
     // You can add more error handling logic here, like showing a snackbar or alert
   };
 
-  console.log("rows",rows);
   const columns: GridColDef[] = [
     { field: 'clientId', headerName: 'Client Id', width: 240, editable: true, headerClassName: 'column-header'},
     { field: 'clientName',headerName: 'Client Name', width: 240, editable: true , headerClassName: 'column-header'},
