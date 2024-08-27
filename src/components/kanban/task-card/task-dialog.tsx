@@ -8,9 +8,11 @@ import Dialog from '@mui/material/Dialog';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import { Box, DialogContent, TextField } from "@mui/material";
+import { Box, DialogContent, Link, TextField } from "@mui/material";
+import CandidatesList from "./candidates-list";
 import { useTaskStore } from "../../../lib/store";
+import {useCandidateStore} from '../../../lib/candidateStore';
+
 
 interface TaskDialogProps {
     task: Task;
@@ -19,10 +21,18 @@ interface TaskDialogProps {
 }
 
 export default function TaskDialog({open, setOpen, task}: TaskDialogProps){
+  const {getCandidates} = useCandidateStore();
   const [description, setDescription] = useState(task.description);
   const inputRef = useRef<HTMLInputElement>(null);
   const [editDisable, setIsEditDisable] = useState(true);
   const updateTask = useTaskStore((state) => state.updateTask);
+  const [candidateAnchorEl, setCandidateAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openCandidates = Boolean(candidateAnchorEl);
+  const handleClickCandidates = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    getCandidates();
+    setCandidateAnchorEl(event.currentTarget);
+  }
   const handleDoubleClick = () => {
     setIsEditDisable(false);
     if (inputRef.current) {
@@ -56,21 +66,30 @@ export default function TaskDialog({open, setOpen, task}: TaskDialogProps){
       <>
         <Dialog open={open} onClose={handleClose}
           fullWidth= {true}
-          maxWidth= 'lg'
-          
+          maxWidth= 'xl'
+          PaperProps={{
+            sx: {
+              height: '100%',
+              maxHeight: '90%',
+            }
+          }}
         >
           <DialogContent
             sx={{
-              maxHeight: '600px',
+              // maxHeight: '800px',
               height: '100%',
             }}
           >
 
-            <div className="d-flex flex-row w-full h-full">
+            <Box className="d-flex flex-row w-full h-full"
+              sx={{
+                height: '100%',
+              }}
+            >
               <Box className="me-auto pt-5 "
                 sx={{
                   width: '100%',
-
+                  maxHeight: '900px',
                   height: '100%',
                 }}
               >
@@ -174,6 +193,29 @@ export default function TaskDialog({open, setOpen, task}: TaskDialogProps){
                     </div>
                   </AccordionDetails>
                 </Accordion>
+                <div className="px-3 py-2">
+                  <div className="ralewayFontRegular " style={{ fontSize: 14}}>Activity</div>
+                  <div className="d-flex flex-row py-1 poppins-light">
+                    <div className="poppins-light pe-2">Show: </div>
+                    <Link className="poppins-light px-2 text-dark"  underline="hover" 
+                    sx={{
+                      cursor: 'pointer',
+                    }}
+                    onClick={handleClickCandidates}
+                    >
+                      Candidates
+                    </Link>
+                    <CandidatesList open={openCandidates} anchorEl={candidateAnchorEl} setAnchorEl={setCandidateAnchorEl}/>
+                    <Link className="poppins-light px-2 text-dark" underline="hover"
+                    sx={{
+                      cursor: 'pointer',
+                    }}>
+                      Task History
+                    </Link>
+
+
+                  </div>
+                </div>
                 </div>
               </Box>
               <div className="" >
@@ -183,7 +225,7 @@ export default function TaskDialog({open, setOpen, task}: TaskDialogProps){
 
               </div> 
 
-            </div>
+            </Box>
             </DialogContent>
         </Dialog>
       </>

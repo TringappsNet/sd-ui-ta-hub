@@ -41,6 +41,7 @@ export default function Candidates(){
     const [open, setOpen] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [newCandidate, setNewCandidate] = useState({
+        
         candidateName: '',
         candidateEmail: '',
         candidateContact: '',
@@ -110,7 +111,15 @@ export default function Candidates(){
           return;
       }  
       try {
-          const addedCandidate = await addCandidate(newCandidate);
+        const addedCandidate = await addCandidate({
+          ...newCandidate,
+            candidateId: 0, // add a default value or generate a unique id
+            remarks: '',
+            createdDate: new Date(),
+            lastUpdated: new Date(),
+            clientName: '', // add this property
+            taskCandidateStatus: '', // add this property
+          });
           getCandidates();
           handleClose();
           setNewCandidate({
@@ -231,7 +240,6 @@ const handleCancelDelete = () => {
     // You can add more error handling logic here, like showing a snackbar or alert
   };
 
-  console.log("rows",rows);
   const columns: GridColDef[] = [
     { field: 'candidateName', headerName: 'Candidate Name', width: 180, editable: true, headerClassName: 'column-header' },
     { field: 'candidateEmail', headerName: 'Email', width: 200, editable: true, headerClassName: 'column-header' },

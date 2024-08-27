@@ -60,7 +60,6 @@ export const useCandidateStore = create<State & Actions>()(
                     isLoading: false,
                     isInitialized: true
                 });
-                console.log('Candidates in store:', get().candidates);
             } catch (error) {
                 console.error('Error fetching data from server:', error);
                 set({ isLoading: false, isInitialized: true });

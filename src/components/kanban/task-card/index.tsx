@@ -20,13 +20,15 @@ export interface TaskDragData {
 
 export function TaskCard({ task, isOverlay }: TaskCardProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [menuJustClosed, setMenuJustClosed] = useState(false);
   const {updateTask} = useTaskStore();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [status, setStatus] = useState({ label: 'Low', value: 0, color: '#00ff0a' });
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
     event.stopPropagation(); // Prevent card click event from firing
+    setAnchorEl(event.currentTarget);
+    
   };
   const options = [
     { label: 'Low', value: 0, color: '#00ff0a' },
@@ -38,13 +40,16 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
 
   const handleClose = (value:number, event) => {
     event.stopPropagation(); // Prevent card click event from firing
+    setMenuJustClosed(true);
+    setAnchorEl(null);
+    setTimeout(() => setMenuJustClosed(false), 100);
     const selectedOption = options.find(option => option.value === value);
     if (selectedOption) {
       task.taskStatus = selectedOption.label;
       updateTask(task.taskId, task );
       setStatus(selectedOption);
     }
-    setAnchorEl(null);
+    
   };
   const {
     setNodeRef,
@@ -77,7 +82,6 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
       ref={setNodeRef} 
       style={style} 
       className={`mb-3 ${isDragging ? 'border border-primary card' : 'card'}`}
-      onClick={()=>setDialogOpen(true)}
     >
       <CardHeader
         className="d-flex w-full "
@@ -121,12 +125,18 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
         }}
       />
       <CardContent
+        onClick={() => {
+          if (!open && !menuJustClosed) {
+            setDialogOpen(true);
+          }
+        }}
         sx={{
           padding: '30px 10px 10px 10px',
           '&:last-child': {
             paddingBottom: '10px',
           }
         }}
+        
       >
         <Typography variant="body2" className="text-left">
         <Button
@@ -150,9 +160,21 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
           id="basic-menu"
           anchorEl={anchorEl}
           open={open}
-          onClose={handleClose}
+          onClose={(e)=> handleClose(status.value,e)}
           MenuListProps={{
             'aria-labelledby': 'basic-button',
+          }}
+          sx={{
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
+          }}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
           }}
         >
           <MenuItem  onClick={(e) => handleClose(0,e)}>Low</MenuItem>
